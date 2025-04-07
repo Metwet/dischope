@@ -52,10 +52,6 @@ const Dashboard = () => {
     createDays(currentTodoList);
   }, [currentTodoList]);
 
-  useUpdateEffect(() => {
-    console.log(currentDays);
-  }, [currentDays]);
-
   return (
     <Box className={styles.todolist}>
       <DndContext onDragEnd={handleDragEnd}>

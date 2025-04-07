@@ -21,9 +21,12 @@ const Draggable: FC<IDraggableProps> = ({ children, id }) => {
 
   return (
     <div ref={setNodeRef} style={style} {...attributes}>
-      <Box display="flex" gap={1}>
+      <Box display="flex" alignItems="center" gap={1}>
         {children}
-        <DragIndicator {...listeners} />
+        <DragIndicator
+          {...listeners}
+          sx={{ cursor: transform ? "grabbing" : "grab" }}
+        />
       </Box>
     </div>
   );

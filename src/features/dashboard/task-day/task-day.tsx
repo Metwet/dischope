@@ -1,9 +1,9 @@
 import { Box, Checkbox, FormControlLabel, Typography } from "@mui/material";
 import { ChangeEvent, FC, SyntheticEvent } from "react";
-import Droppable from "../droppable/droppable";
-import Draggable from "../draggable/draggable";
 import styles from "../dashboard.module.css";
 import TaskInput from "../task-input/task-input";
+import Droppable from "@/shared/dnd/droppable/droppable";
+import Draggable from "@/shared/dnd/draggable/draggable";
 
 interface ITaskDayProps {
   day: string;
