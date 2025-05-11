@@ -1,5 +1,10 @@
 "use client";
 
+import {
+  useSetTasks,
+  useTasks,
+  useUpdateTaskDate,
+} from "@/entities/tasks/store/selectors";
 import { getTestTasks } from "@/shared/api/dashboard-api";
 import { useUpdateEffect } from "@/shared/hooks/useUpdateEffect";
 import { DndContext, DragEndEvent } from "@dnd-kit/core";
@@ -9,7 +14,9 @@ import styles from "./dashboard.module.css";
 import TaskDay from "./task-day/task-day";
 
 const Dashboard = () => {
-  const [currentTodoList, setCurrentTodoList] = useState<Array<ITask>>([]);
+  const tasks = useTasks();
+  const setTasks = useSetTasks();
+  const updateTaskDate = useUpdateTaskDate();
   const [currentDays, setCurrentDays] = useState<ITaskDays | null>(null);
 
   const createDays = (tasks: Array<ITask>) => {
@@ -43,29 +50,24 @@ const Dashboard = () => {
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
-    let needToCange: boolean = false;
-    const items = currentTodoList.map((task) => {
-      if (task.id === Number(active.id) && !!over) {
-        const date = new Date(over.id);
-        task.create_date = date.toISOString();
-        needToCange = true;
-      }
-      return task;
-    });
-    if (needToCange) {
-      setCurrentTodoList(items);
+    if (active && over) {
+      const date = new Date(over.id.toString());
+      updateTaskDate(Number(active.id), date.toISOString());
     }
   };
 
   useEffect(() => {
-    getTestTasks().then((data) => {
-      setCurrentTodoList(data);
-    });
+    if (!tasks.length) {
+      getTestTasks().then((data) => {
+        setTasks(data);
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useUpdateEffect(() => {
-    createDays(currentTodoList);
-  }, [currentTodoList]);
+    createDays(tasks);
+  }, [tasks]);
 
   return (
     <Box className={styles.todolist}>
@@ -80,8 +82,8 @@ const Dashboard = () => {
                     key={index}
                     day={day}
                     taskList={currentDays[day]}
-                    currentTodoList={currentTodoList}
-                    setCurrentTodoList={setCurrentTodoList}
+                    currentTodoList={tasks}
+                    setCurrentTodoList={setTasks}
                   />
                 ))}
           </Box>
