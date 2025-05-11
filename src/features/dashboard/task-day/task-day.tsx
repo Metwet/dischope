@@ -1,9 +1,8 @@
+import { Draggable } from "@/shared/dnd/draggable/draggable";
+import { Droppable } from "@/shared/dnd/droppable/droppable";
 import { Box, Checkbox, FormControlLabel, Typography } from "@mui/material";
 import { ChangeEvent, FC, SyntheticEvent } from "react";
-import styles from "../dashboard.module.css";
-import TaskInput from "../task-input/task-input";
-import Droppable from "@/shared/dnd/droppable/droppable";
-import Draggable from "@/shared/dnd/draggable/draggable";
+import { TaskInput } from "../task-input/task-input";
 
 interface ITaskDayProps {
   day: string;
@@ -12,7 +11,7 @@ interface ITaskDayProps {
   setCurrentTodoList: (currentTodoList: Array<ITask>) => void;
 }
 
-const TaskDay: FC<ITaskDayProps> = ({
+export const TaskDay: FC<ITaskDayProps> = ({
   day,
   taskList,
   currentTodoList,
@@ -46,7 +45,7 @@ const TaskDay: FC<ITaskDayProps> = ({
       {!!taskList.length
         ? taskList.map((task) => (
             <Draggable key={task.id} id={task.id.toString()}>
-              <Box className={styles.task}>
+              <Box sx={{ p: "2px", fontSize: "20px" }}>
                 <FormControlLabel
                   control={<Checkbox />}
                   label={
@@ -73,5 +72,3 @@ const TaskDay: FC<ITaskDayProps> = ({
     </Droppable>
   );
 };
-
-export default TaskDay;

@@ -1,5 +1,4 @@
 import { Input } from "@mui/material";
-import styles from "./task-input.module.css";
 import { ChangeEvent, FC } from "react";
 
 interface ITaskInputProps {
@@ -8,7 +7,7 @@ interface ITaskInputProps {
   lineThrough: boolean;
 }
 
-const TaskInput: FC<ITaskInputProps> = ({
+export const TaskInput: FC<ITaskInputProps> = ({
   value,
   handleInputChange,
   lineThrough,
@@ -17,11 +16,9 @@ const TaskInput: FC<ITaskInputProps> = ({
     <Input
       value={value}
       onChange={handleInputChange}
-      className={`${lineThrough ? styles.lineThrough : ""}`}
+      sx={{ textDecoration: lineThrough ? "line-through" : "none" }}
       disableUnderline
       multiline
     />
   );
 };
-
-export default TaskInput;

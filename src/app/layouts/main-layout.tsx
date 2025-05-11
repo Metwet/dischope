@@ -39,7 +39,7 @@ const MainLayout: FC<IMainLayoutProps> = ({ children }) => {
   return (
     <ThemeProvider theme={currentTheme}>
       <CssBaseline />
-      <Container maxWidth="lg">
+      <Container maxWidth="xl">
         <Header theme={theme} toggleTheme={toggleTheme} />
         {children}
       </Container>

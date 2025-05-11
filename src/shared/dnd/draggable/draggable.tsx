@@ -8,7 +8,7 @@ interface IDraggableProps {
   id: string;
 }
 
-const Draggable: FC<IDraggableProps> = ({ children, id }) => {
+export const Draggable: FC<IDraggableProps> = ({ children, id }) => {
   const { attributes, listeners, setNodeRef, transform } = useDraggable({
     id,
   });
@@ -31,5 +31,3 @@ const Draggable: FC<IDraggableProps> = ({ children, id }) => {
     </div>
   );
 };
-
-export default Draggable;

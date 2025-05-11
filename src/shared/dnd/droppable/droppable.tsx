@@ -6,7 +6,7 @@ interface IDroppableProps {
   id: string;
 }
 
-const Droppable: FC<IDroppableProps> = ({ children, id }) => {
+export const Droppable: FC<IDroppableProps> = ({ children, id }) => {
   const { isOver, setNodeRef } = useDroppable({
     id,
   });
@@ -21,5 +21,3 @@ const Droppable: FC<IDroppableProps> = ({ children, id }) => {
     </div>
   );
 };
-
-export default Droppable;

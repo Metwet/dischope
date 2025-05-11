@@ -10,10 +10,9 @@ import { useUpdateEffect } from "@/shared/hooks/useUpdateEffect";
 import { DndContext, DragEndEvent } from "@dnd-kit/core";
 import { Box, FormGroup } from "@mui/material";
 import { useEffect, useState } from "react";
-import styles from "./dashboard.module.css";
-import TaskDay from "./task-day/task-day";
+import { TaskDay } from "./task-day/task-day";
 
-const Dashboard = () => {
+export const Dashboard = () => {
   const tasks = useTasks();
   const setTasks = useSetTasks();
   const updateTaskDate = useUpdateTaskDate();
@@ -70,27 +69,33 @@ const Dashboard = () => {
   }, [tasks]);
 
   return (
-    <Box className={styles.todolist}>
-      <DndContext onDragEnd={handleDragEnd}>
-        <FormGroup>
-          <Box>
-            {currentDays &&
-              Object.keys(currentDays)
-                .sort((a, b) => new Date(a).getTime() - new Date(b).getTime())
-                .map((day, index) => (
+    <DndContext onDragEnd={handleDragEnd}>
+      <FormGroup>
+        <Box
+          sx={{
+            display: "flex",
+            flexWrap: "wrap",
+            gap: 2,
+          }}
+        >
+          {currentDays &&
+            Object.keys(currentDays)
+              .sort((a, b) => new Date(a).getTime() - new Date(b).getTime())
+              .map((day, index) => (
+                <Box
+                  key={index}
+                  sx={{ width: "calc(100% / 7 - 16px)", minWidth: "180px" }}
+                >
                   <TaskDay
-                    key={index}
                     day={day}
                     taskList={currentDays[day]}
                     currentTodoList={tasks}
                     setCurrentTodoList={setTasks}
                   />
-                ))}
-          </Box>
-        </FormGroup>
-      </DndContext>
-    </Box>
+                </Box>
+              ))}
+        </Box>
+      </FormGroup>
+    </DndContext>
   );
 };
-
-export default Dashboard;
