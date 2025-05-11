@@ -13,13 +13,28 @@ const Dashboard = () => {
   const [currentDays, setCurrentDays] = useState<ITaskDays | null>(null);
 
   const createDays = (tasks: Array<ITask>) => {
+    if (tasks.length === 0) {
+      setCurrentDays({});
+      return;
+    }
+
     const days: ITaskDays = {};
+
+    const dates = tasks.map((task) => new Date(task.create_date).getTime());
+    const minDate = new Date(Math.min(...dates));
+    const maxDate = new Date(Math.max(...dates));
+
+    const currentDate = new Date(minDate);
+    while (currentDate <= maxDate) {
+      const dayStr = currentDate.toDateString();
+      days[dayStr] = [];
+      currentDate.setDate(currentDate.getDate() + 1);
+    }
+
     tasks.forEach((task) => {
       const date = new Date(task.create_date);
       const day = date.toDateString();
-      if (!days[day]) {
-        days[day] = [task];
-      } else {
+      if (!!days[day]) {
         days[day].push(task);
       }
     });
@@ -56,18 +71,20 @@ const Dashboard = () => {
     <Box className={styles.todolist}>
       <DndContext onDragEnd={handleDragEnd}>
         <FormGroup>
-          {currentDays &&
-            Object.keys(currentDays)
-              .sort((a, b) => new Date(a).getTime() - new Date(b).getTime())
-              .map((day, index) => (
-                <TaskDay
-                  key={index}
-                  day={day}
-                  taskList={currentDays[day]}
-                  currentTodoList={currentTodoList}
-                  setCurrentTodoList={setCurrentTodoList}
-                />
-              ))}
+          <Box>
+            {currentDays &&
+              Object.keys(currentDays)
+                .sort((a, b) => new Date(a).getTime() - new Date(b).getTime())
+                .map((day, index) => (
+                  <TaskDay
+                    key={index}
+                    day={day}
+                    taskList={currentDays[day]}
+                    currentTodoList={currentTodoList}
+                    setCurrentTodoList={setCurrentTodoList}
+                  />
+                ))}
+          </Box>
         </FormGroup>
       </DndContext>
     </Box>
