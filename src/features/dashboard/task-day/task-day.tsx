@@ -3,40 +3,28 @@ import { Droppable } from "@/shared/dnd/droppable/droppable";
 import { Box, Checkbox, FormControlLabel, Typography } from "@mui/material";
 import { ChangeEvent, FC, SyntheticEvent } from "react";
 import { TaskInput } from "../task-input/task-input";
+import {
+  useToggleTaskDone,
+  useUpdateTaskText,
+} from "@/entities/tasks/store/selectors";
 
 interface ITaskDayProps {
   day: string;
   taskList: Array<ITask>;
-  currentTodoList: Array<ITask>;
-  setCurrentTodoList: (currentTodoList: Array<ITask>) => void;
 }
 
-export const TaskDay: FC<ITaskDayProps> = ({
-  day,
-  taskList,
-  currentTodoList,
-  setCurrentTodoList,
-}) => {
+export const TaskDay: FC<ITaskDayProps> = ({ day, taskList }) => {
+  const toggleTaskDone = useToggleTaskDone();
+  const updateTaskText = useUpdateTaskText();
+
   const handleCheck = (checkedTask: ITask, checked: boolean) => {
-    const items = currentTodoList.map((task) => {
-      if (task.id === checkedTask.id) {
-        task.done = checked;
-      }
-      return task;
-    });
-    setCurrentTodoList(items);
+    toggleTaskDone(checkedTask.id, checked);
   };
 
   const handleInputChange = (event: ChangeEvent, changedTask: ITask) => {
     const element = event.currentTarget as HTMLInputElement;
     const value = element.value;
-    const items = currentTodoList.map((task) => {
-      if (task.id === changedTask.id) {
-        task.text = value;
-      }
-      return task;
-    });
-    setCurrentTodoList(items);
+    updateTaskText(changedTask.id, value);
   };
 
   return (

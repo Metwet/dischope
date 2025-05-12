@@ -86,12 +86,7 @@ export const Dashboard = () => {
                   key={index}
                   sx={{ width: "calc(100% / 7 - 16px)", minWidth: "180px" }}
                 >
-                  <TaskDay
-                    day={day}
-                    taskList={currentDays[day]}
-                    currentTodoList={tasks}
-                    setCurrentTodoList={setTasks}
-                  />
+                  <TaskDay day={day} taskList={currentDays[day]} />
                 </Box>
               ))}
         </Box>

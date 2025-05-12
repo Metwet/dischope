@@ -6,6 +6,8 @@ interface TaskStore {
   tasks: ITask[];
   setTasks: (task: ITask[]) => void;
   updateTaskDate: (id: number, newDate: string) => void;
+  toggleTaskDone: (id: number, done: boolean) => void;
+  updateTaskText: (id: number, text: string) => void;
 }
 
 export const useTasksStore = create<TaskStore>()(
@@ -22,6 +24,18 @@ export const useTasksStore = create<TaskStore>()(
           set((state) => {
             const task = state.tasks.find((t) => t.id === id);
             if (task) task.create_date = newDate;
+          });
+        },
+        toggleTaskDone: (id, done) => {
+          set((state) => {
+            const task = state.tasks.find((t) => t.id === id);
+            if (task) task.done = done;
+          });
+        },
+        updateTaskText: (id, text) => {
+          set((state) => {
+            const task = state.tasks.find((t) => t.id === id);
+            if (task) task.text = text;
           });
         },
       })),
