@@ -3,44 +3,43 @@ import { devtools, persist } from "zustand/middleware";
 import { immer } from "zustand/middleware/immer";
 
 interface TaskStore {
-  tasks: ITask[];
-  setTasks: (task: ITask[]) => void;
-  updateTaskDate: (id: number, newDate: string) => void;
-  toggleTaskDone: (id: number, done: boolean) => void;
-  updateTaskText: (id: number, text: string) => void;
+  tasksById: Record<number, ITask>;
+  taskIds: number[];
+  setTasks: (tasks: ITask[]) => void;
+  updateTaskField: <K extends keyof ITask>(
+    id: number,
+    field: K,
+    value: ITask[K]
+  ) => void;
 }
 
 export const useTasksStore = create<TaskStore>()(
   devtools(
     persist(
       immer((set) => ({
-        tasks: [],
+        tasksById: {},
+        taskIds: [],
         setTasks: (tasks) => {
           set((state) => {
-            state.tasks = tasks;
+            state.tasksById = {};
+            state.taskIds = [];
+            tasks.forEach((task) => {
+              state.tasksById[task.id] = task;
+              state.taskIds.push(task.id);
+            });
           });
         },
-        updateTaskDate: (id, newDate) => {
+        updateTaskField: (id, field, value) => {
           set((state) => {
-            const task = state.tasks.find((t) => t.id === id);
-            if (task) task.create_date = newDate;
-          });
-        },
-        toggleTaskDone: (id, done) => {
-          set((state) => {
-            const task = state.tasks.find((t) => t.id === id);
-            if (task) task.done = done;
-          });
-        },
-        updateTaskText: (id, text) => {
-          set((state) => {
-            const task = state.tasks.find((t) => t.id === id);
-            if (task) task.text = text;
+            const task = state.tasksById[id];
+            if (task) {
+              task[field] = value;
+            }
           });
         },
       })),
       { name: "tasks-store" }
     ),
-    { name: "TasksStore" }
+    { name: "TaskStore" }
   )
 );

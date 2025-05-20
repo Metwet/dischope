@@ -1,4 +1,4 @@
-import { useTasks } from "@/entities/tasks/store/selectors";
+import { useTaskIds } from "@/entities/tasks/store/selectors";
 import {
   DndContext,
   DragEndEvent,
@@ -17,8 +17,8 @@ import { useState } from "react";
 import { TaskItem } from "./task-item/task-item";
 
 export const NewDnd = () => {
-  const tasks = useTasks();
-  const [sortableTasks, setSortableTasks] = useState<ITask[]>(tasks);
+  const taskIds = useTaskIds();
+  const [sortableTaskIds, setSortableTaskIds] = useState<number[]>(taskIds);
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {
@@ -32,20 +32,20 @@ export const NewDnd = () => {
     if (!over) return;
 
     if (active.id !== over.id) {
-      const oldIndex = sortableTasks.findIndex((task) => task.id === active.id);
-      const newIndex = sortableTasks.findIndex((task) => task.id === over.id);
-      console.log({ sortableTasks, oldIndex, newIndex, active, over });
+      const oldIndex = sortableTaskIds.findIndex((task) => task === active.id);
+      const newIndex = sortableTaskIds.findIndex((task) => task === over.id);
+      console.log({ sortableTaskIds, oldIndex, newIndex, active, over });
 
-      setSortableTasks(arrayMove(sortableTasks, oldIndex, newIndex));
+      setSortableTaskIds(arrayMove(sortableTaskIds, oldIndex, newIndex));
     }
   };
 
   return (
     <Box>
       <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
-        <SortableContext items={sortableTasks}>
-          {sortableTasks.map((task) => (
-            <TaskItem task={task} key={task.id} />
+        <SortableContext items={sortableTaskIds}>
+          {sortableTaskIds.map((id) => (
+            <TaskItem id={id} key={id} />
           ))}
         </SortableContext>
       </DndContext>

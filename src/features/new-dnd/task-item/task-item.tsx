@@ -2,19 +2,22 @@ import { useSortable } from "@dnd-kit/sortable";
 import { Box } from "@mui/material";
 import { FC } from "react";
 import { CSS } from "@dnd-kit/utilities";
+import { useTaskById } from "@/entities/tasks/store/selectors";
 
 interface TaskItemProps {
-  task: ITask;
+  id: number;
 }
 
-export const TaskItem: FC<TaskItemProps> = ({ task }) => {
+export const TaskItem: FC<TaskItemProps> = ({ id }) => {
   const { attributes, listeners, setNodeRef, transform, transition } =
-    useSortable({ id: task.id });
+    useSortable({ id });
 
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
   };
+
+  const task = useTaskById(id);
 
   return (
     <Box

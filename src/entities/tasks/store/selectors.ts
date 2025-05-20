@@ -1,10 +1,9 @@
 import { useTasksStore } from "./tasksStore";
 
-export const useTasks = () => useTasksStore((state) => state.tasks);
+export const useTaskIds = () => useTasksStore((state) => state.taskIds);
+export const useTasksById = () => useTasksStore((state) => state.tasksById);
+export const useTaskById = (id: number) =>
+  useTasksStore((state) => state.tasksById[id]);
 export const useSetTasks = () => useTasksStore((state) => state.setTasks);
-export const useUpdateTaskDate = () =>
-  useTasksStore((state) => state.updateTaskDate);
-export const useToggleTaskDone = () =>
-  useTasksStore((state) => state.toggleTaskDone);
-export const useUpdateTaskText = () =>
-  useTasksStore((state) => state.updateTaskText);
+export const useUpdateTaskField = () =>
+  useTasksStore((state) => state.updateTaskField);

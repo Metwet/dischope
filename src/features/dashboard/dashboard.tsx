@@ -2,8 +2,9 @@
 
 import {
   useSetTasks,
-  useTasks,
-  useUpdateTaskDate,
+  useTaskIds,
+  useTasksById,
+  useUpdateTaskField,
 } from "@/entities/tasks/store/selectors";
 import { getTestTasks } from "@/shared/api/dashboard-api";
 import { useUpdateEffect } from "@/shared/hooks/useUpdateEffect";
@@ -13,12 +14,13 @@ import { useEffect, useState } from "react";
 import { TaskDay } from "./task-day/task-day";
 
 export const Dashboard = () => {
-  const tasks = useTasks();
+  const taskIds = useTaskIds();
+  const tasksById = useTasksById();
   const setTasks = useSetTasks();
-  const updateTaskDate = useUpdateTaskDate();
+  const updateTaskField = useUpdateTaskField();
   const [currentDays, setCurrentDays] = useState<ITaskDays | null>(null);
 
-  const createDays = (tasks: Array<ITask>) => {
+  const createDays = (tasks: number[]) => {
     if (tasks.length === 0) {
       setCurrentDays({});
       return;
@@ -26,7 +28,9 @@ export const Dashboard = () => {
 
     const days: ITaskDays = {};
 
-    const dates = tasks.map((task) => new Date(task.create_date).getTime());
+    const dates = tasks.map((id) =>
+      new Date(tasksById[id].create_date).getTime()
+    );
     const minDate = new Date(Math.min(...dates));
     const maxDate = new Date(Math.max(...dates));
 
@@ -37,11 +41,11 @@ export const Dashboard = () => {
       currentDate.setDate(currentDate.getDate() + 1);
     }
 
-    tasks.forEach((task) => {
-      const date = new Date(task.create_date);
+    tasks.forEach((id) => {
+      const date = new Date(tasksById[id].create_date);
       const day = date.toDateString();
       if (!!days[day]) {
-        days[day].push(task);
+        days[day].push(tasksById[id]);
       }
     });
     setCurrentDays(days);
@@ -51,12 +55,12 @@ export const Dashboard = () => {
     const { active, over } = event;
     if (active && over) {
       const date = new Date(over.id.toString());
-      updateTaskDate(Number(active.id), date.toISOString());
+      updateTaskField(Number(active.id), "create_date", date.toISOString());
     }
   };
 
   useEffect(() => {
-    if (!tasks.length) {
+    if (!taskIds.length) {
       getTestTasks().then((data) => {
         setTasks(data);
       });
@@ -65,8 +69,8 @@ export const Dashboard = () => {
   }, []);
 
   useUpdateEffect(() => {
-    createDays(tasks);
-  }, [tasks]);
+    createDays(taskIds);
+  }, [tasksById]);
 
   return (
     <DndContext onDragEnd={handleDragEnd}>

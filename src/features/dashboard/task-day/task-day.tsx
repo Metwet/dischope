@@ -1,12 +1,9 @@
 import { Draggable } from "@/shared/dnd/draggable/draggable";
 import { Droppable } from "@/shared/dnd/droppable/droppable";
 import { Box, Checkbox, FormControlLabel, Typography } from "@mui/material";
-import { ChangeEvent, FC, SyntheticEvent } from "react";
+import { FC, SyntheticEvent } from "react";
 import { TaskInput } from "../task-input/task-input";
-import {
-  useToggleTaskDone,
-  useUpdateTaskText,
-} from "@/entities/tasks/store/selectors";
+import { useUpdateTaskField } from "@/entities/tasks/store/selectors";
 
 interface ITaskDayProps {
   day: string;
@@ -14,17 +11,10 @@ interface ITaskDayProps {
 }
 
 export const TaskDay: FC<ITaskDayProps> = ({ day, taskList }) => {
-  const toggleTaskDone = useToggleTaskDone();
-  const updateTaskText = useUpdateTaskText();
+  const updateTaskField = useUpdateTaskField();
 
   const handleCheck = (checkedTask: ITask, checked: boolean) => {
-    toggleTaskDone(checkedTask.id, checked);
-  };
-
-  const handleInputChange = (event: ChangeEvent, changedTask: ITask) => {
-    const element = event.currentTarget as HTMLInputElement;
-    const value = element.value;
-    updateTaskText(changedTask.id, value);
+    updateTaskField(checkedTask.id, "done", checked);
   };
 
   return (
@@ -39,10 +29,8 @@ export const TaskDay: FC<ITaskDayProps> = ({ day, taskList }) => {
                   label={
                     <Box>
                       <TaskInput
+                        id={task.id}
                         value={task.text}
-                        handleInputChange={(event: ChangeEvent) =>
-                          handleInputChange(event, task)
-                        }
                         lineThrough={task.done}
                       />
                     </Box>
