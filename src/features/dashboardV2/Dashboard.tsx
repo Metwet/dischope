@@ -1,7 +1,7 @@
 "use client";
 import { useSetTasks, useTaskIds } from "@/entities/tasks/store/selectors";
 import { getTestTasks } from "@/shared/api/dashboard-api";
-import { useEffect } from "react";
+import { useCallback, useEffect } from "react";
 import { useDays } from "./model/useDays";
 import {
   closestCorners,
@@ -14,15 +14,9 @@ import {
   useSensor,
   useSensors,
 } from "@dnd-kit/core";
-import {
-  arrayMove,
-  SortableContext,
-  sortableKeyboardCoordinates,
-  verticalListSortingStrategy,
-} from "@dnd-kit/sortable";
-import { Box, FormGroup, Typography } from "@mui/material";
-import { DroppableZone } from "@/shared/dnd/DroppableZone/DroppableZone";
-import { TaskItem } from "./ui/TaskItem";
+import { arrayMove, sortableKeyboardCoordinates } from "@dnd-kit/sortable";
+import { Box, FormGroup } from "@mui/material";
+import { DayColumn } from "./ui/DayColumn";
 
 export const Dashboard = () => {
   const taskIds = useTaskIds();
@@ -37,10 +31,13 @@ export const Dashboard = () => {
     })
   );
 
-  const findContainer = (id: UniqueIdentifier): string | undefined => {
-    if (days.includes(id as string)) return id as string;
-    return days.find((key) => daysTasks[key].includes(id as number));
-  };
+  const findContainer = useCallback(
+    (id: UniqueIdentifier): string | undefined => {
+      if (days.includes(id as string)) return id as string;
+      return days.find((key) => daysTasks[key].includes(id as number));
+    },
+    [days, daysTasks]
+  );
 
   const handleDragOver = (event: DragOverEvent) => {
     const { active, over } = event;
@@ -135,23 +132,8 @@ export const Dashboard = () => {
             gap: 2,
           }}
         >
-          {days.map((day, index) => (
-            <Box
-              key={index}
-              sx={{ width: "calc(100% / 7 - 16px)", minWidth: "180px" }}
-            >
-              <DroppableZone id={day}>
-                <SortableContext
-                  items={daysTasks[day]}
-                  strategy={verticalListSortingStrategy}
-                >
-                  <Typography>{day}</Typography>
-                  {daysTasks[day].map((id) => (
-                    <TaskItem id={id} key={id} />
-                  ))}
-                </SortableContext>
-              </DroppableZone>
-            </Box>
+          {days.map((day) => (
+            <DayColumn key={day} day={day} tasks={daysTasks[day]} />
           ))}
         </Box>
       </FormGroup>
