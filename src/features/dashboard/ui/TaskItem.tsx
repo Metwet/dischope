@@ -7,6 +7,7 @@ import { CSS } from "@dnd-kit/utilities";
 import { Box, Checkbox, FormControlLabel } from "@mui/material";
 import { SyntheticEvent } from "react";
 import { TaskInput } from "./TaskInput";
+import { DragIndicator } from "@mui/icons-material";
 
 interface TaskItemProps {
   id: number;
@@ -31,14 +32,13 @@ export const TaskItem = ({ id }: TaskItemProps) => {
   return (
     <Box
       ref={setNodeRef}
-      {...attributes}
-      {...listeners}
       style={style}
       sx={{
         m: 1,
         p: 2,
         backgroundColor: "blue",
-        cursor: transform ? "grabbing" : "grab",
+        display: "flex",
+        alignItems: "center",
       }}
     >
       <FormControlLabel
@@ -49,10 +49,19 @@ export const TaskItem = ({ id }: TaskItemProps) => {
           </Box>
         }
         checked={task.done}
-        onChange={(event: SyntheticEvent<Element, Event>, checked: boolean) =>
+        onChange={(_event: SyntheticEvent<Element, Event>, checked: boolean) =>
           handleCheck(task, checked)
         }
       />
+      <Box
+        {...attributes}
+        {...listeners}
+        sx={{
+          cursor: transform ? "grabbing" : "grab",
+        }}
+      >
+        <DragIndicator />
+      </Box>
     </Box>
   );
 };

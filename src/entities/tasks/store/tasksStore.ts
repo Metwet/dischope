@@ -3,6 +3,7 @@ import { devtools } from "zustand/middleware";
 import { immer } from "zustand/middleware/immer";
 
 interface TaskStore {
+  // tasks: ITask[];
   tasksById: Record<number, ITask>;
   taskIds: number[];
   setTasks: (tasks: ITask[]) => void;
@@ -17,10 +18,12 @@ export const useTasksStore = create<TaskStore>()(
   devtools(
     //persist(
     immer((set) => ({
+      // tasks: [],
       tasksById: {},
       taskIds: [],
       setTasks: (tasks) => {
         set((state) => {
+          //state.tasks = tasks;
           state.tasksById = {};
           state.taskIds = [];
           tasks.forEach((task) => {
@@ -35,6 +38,7 @@ export const useTasksStore = create<TaskStore>()(
           if (task) {
             task[field] = value;
           }
+          state.tasksById[id] = task;
         });
       },
     })),
