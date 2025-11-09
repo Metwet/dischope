@@ -1,6 +1,6 @@
 import { useUpdateTaskField } from "@/entities/tasks/store/selectors";
 import { Input } from "@mui/material";
-import { ChangeEvent, FC, useRef, useState } from "react";
+import { ChangeEvent, FC, useEffect, useRef, useState } from "react";
 
 interface ITaskInputProps {
   id: number;
@@ -26,6 +26,14 @@ export const TaskInput: FC<ITaskInputProps> = ({ id, value, lineThrough }) => {
       updateTaskField(id, "text", newValue);
     }, 300);
   };
+
+  useEffect(() => {
+    return () => {
+      if (debounceTimer.current) {
+        clearTimeout(debounceTimer.current);
+      }
+    };
+  }, []);
 
   return (
     <Input

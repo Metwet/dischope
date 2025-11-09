@@ -3,12 +3,12 @@ import { Box, IconButton, Tooltip, Typography } from "@mui/material";
 import { FC } from "react";
 import styles from "./header.module.css";
 
-interface IHeaderPropps {
+interface IHeaderProps {
   theme: TTheme;
   toggleTheme: () => void;
 }
 
-const Header: FC<IHeaderPropps> = ({ theme, toggleTheme }) => {
+const Header: FC<IHeaderProps> = ({ theme, toggleTheme }) => {
   return (
     <Box className={styles.header}>
       <Typography variant="h3">dischope</Typography>

@@ -7,7 +7,3 @@ interface ITask {
   create_date: string;
   //appointed_date: string;
 }
-
-interface ITaskDays {
-  [key: string]: Array<ITasks>;
-}
