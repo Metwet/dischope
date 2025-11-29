@@ -50,3 +50,6 @@ backend/generated/
 # database
 *.db
 *.sqlite
+
+# helpers
+backend/help-info
