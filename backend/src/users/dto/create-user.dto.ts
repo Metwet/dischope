@@ -1,9 +1,15 @@
-import { IsEmail, IsNotEmpty, IsOptional, IsString, MinLength } from 'class-validator';
+import {
+  IsEmail,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  MinLength,
+} from 'class-validator';
 
 /**
  * DTO (Data Transfer Object) - это класс, который описывает структуру данных
  * для создания пользователя
- * 
+ *
  * Декораторы (@ символы) используются для валидации данных:
  * - @IsEmail() - проверяет, что это валидный email
  * - @IsNotEmpty() - поле не может быть пустым
@@ -37,4 +43,3 @@ export class CreateUserDto {
   @IsOptional()
   name?: string;
 }
-

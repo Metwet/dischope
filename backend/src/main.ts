@@ -3,7 +3,7 @@ import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 
 /**
- * bootstrap - функция, которая запускает наше приложение
+ * bootstrap - функция, которая запускает приложение
  */
 async function bootstrap() {
   // Создаем экземпляр приложения NestJS

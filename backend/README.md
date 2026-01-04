@@ -1,98 +1,239 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Dischope Backend
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+REST API для приложения управления задачами Dischope, построенный на [NestJS](https://nestjs.com/).
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## Описание
 
-## Description
+Backend приложение на NestJS с PostgreSQL базой данных и Prisma ORM.
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+### Основные модули:
 
-## Project setup
+- **Users** - управление пользователями
+- **Tasks** - управление задачами (создание, получение, обновление, удаление)
+
+### Технологии:
+
+- NestJS - фреймворк для Node.js
+- TypeScript - типизированный JavaScript
+- Prisma - современная ORM для работы с БД
+- PostgreSQL - реляционная база данных
+- class-validator - валидация данных
+- bcrypt - хеширование паролей
+
+## Быстрый старт
+
+### 1. Установка зависимостей
 
 ```bash
-$ pnpm install
+pnpm install
 ```
 
-## Compile and run the project
+### 2. Запуск базы данных
 
 ```bash
-# development
-$ pnpm run start
+cd ../docker
+docker compose up -d
+```
 
-# watch mode
-$ pnpm run start:dev
+### 3. Применение миграций
+
+```bash
+npx prisma migrate dev
+```
+
+### 4. Запуск сервера
+
+```bash
+# development mode
+pnpm run start
+
+# watch mode (рекомендуется для разработки)
+pnpm run start:dev
 
 # production mode
-$ pnpm run start:prod
+pnpm run start:prod
 ```
 
-## Run tests
+Сервер запустится на http://localhost:3000
+
+## Доступные API
+
+### Users API
+- `POST /users` - создать пользователя
+- `GET /users` - получить всех пользователей
+- `GET /users/:id` - получить пользователя по ID
+
+### Tasks API
+- `POST /tasks` - создать задачу
+- `GET /tasks` - получить все задачи
+- `GET /tasks?userId=:id` - получить задачи пользователя
+- `GET /tasks/:id` - получить задачу по ID
+- `PATCH /tasks/:id` - обновить задачу
+- `DELETE /tasks/:id` - удалить задачу
+
+## Документация
+
+📚 Детальная документация находится в папке `help-info/`:
+
+- [TASKS_QUICKSTART.md](./help-info/TASKS_QUICKSTART.md) - быстрый старт для работы с задачами
+- [TASKS_API.md](./help-info/TASKS_API.md) - полное описание Tasks API
+- [API_GUIDE.md](./help-info/API_GUIDE.md) - общее руководство по API
+- [LOCAL_SETUP.md](./help-info/LOCAL_SETUP.md) - настройка окружения
+- [Postman коллекции](./help-info/) - готовые запросы для тестирования
+
+## Примеры использования
+
+### Создать пользователя
+
+```bash
+curl -X POST http://localhost:3000/users \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "test@example.com",
+    "password": "password123",
+    "name": "Иван Иванов"
+  }'
+```
+
+### Создать задачу
+
+```bash
+curl -X POST http://localhost:3000/tasks \
+  -H "Content-Type: application/json" \
+  -d '{
+    "title": "Выучить NestJS",
+    "userId": "USER_ID_ЗДЕСЬ",
+    "plannedAt": "2024-01-15T10:00:00Z"
+  }'
+```
+
+### Получить все задачи
+
+```bash
+curl http://localhost:3000/tasks
+```
+
+## Структура проекта
+
+```
+backend/
+├── src/
+│   ├── users/           # Модуль пользователей
+│   │   ├── dto/         # Data Transfer Objects
+│   │   ├── users.controller.ts
+│   │   ├── users.service.ts
+│   │   └── users.module.ts
+│   ├── tasks/           # Модуль задач
+│   │   ├── dto/
+│   │   ├── tasks.controller.ts
+│   │   ├── tasks.service.ts
+│   │   └── tasks.module.ts
+│   ├── prisma.service.ts
+│   ├── app.module.ts
+│   └── main.ts
+├── prisma/
+│   ├── schema.prisma    # Схема базы данных
+│   └── migrations/      # Миграции
+├── help-info/           # Документация
+└── package.json
+```
+
+## Команды для разработки
 
 ```bash
 # unit tests
-$ pnpm run test
+pnpm run test
 
 # e2e tests
-$ pnpm run test:e2e
+pnpm run test:e2e
 
 # test coverage
-$ pnpm run test:cov
+pnpm run test:cov
+
+# build
+pnpm run build
+
+# lint
+pnpm run lint
+
+# format
+pnpm run format
 ```
 
-## Deployment
-
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+## Prisma команды
 
 ```bash
-$ pnpm install -g @nestjs/mau
-$ mau deploy
+# Открыть Prisma Studio (GUI для БД)
+npx prisma studio
+
+# Создать миграцию
+npx prisma migrate dev --name migration_name
+
+# Применить миграции
+npx prisma migrate deploy
+
+# Сгенерировать Prisma Client
+npx prisma generate
+
+# Сбросить БД (ОСТОРОЖНО!)
+npx prisma migrate reset
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+## Переменные окружения
 
-## Resources
+Создайте файл `.env` в корне backend/:
 
-Check out a few resources that may come in handy when working with NestJS:
+```env
+DATABASE_URL="postgresql://user:password@localhost:5432/dischope"
+PORT=3000
+```
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+## Возможные проблемы
 
-## Support
+### База данных не запущена
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+```
+Error: Can't reach database server
+```
 
-## Stay in touch
+**Решение:** Запустите PostgreSQL через Docker Compose:
+```bash
+cd ../docker
+docker-compose up -d
+```
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+### Миграции не применены
 
-## License
+```
+Error: Table does not exist
+```
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+**Решение:** Примените миграции:
+```bash
+npx prisma migrate dev
+```
+
+### Порт занят
+
+```
+Error: Port 3000 is already in use
+```
+
+**Решение:** Измените порт в `src/main.ts` или остановите процесс на порту 3000
+
+## Ресурсы
+
+- [NestJS Documentation](https://docs.nestjs.com)
+- [Prisma Documentation](https://www.prisma.io/docs)
+- [PostgreSQL Documentation](https://www.postgresql.org/docs/)
+
+## Следующие шаги
+
+- [ ] Добавить JWT аутентификацию
+- [ ] Добавить авторизацию (роли пользователей)
+- [ ] Добавить пагинацию для списков
+- [ ] Добавить фильтрацию и сортировку
+- [ ] Добавить Swagger документацию
+- [ ] Написать тесты
+- [ ] Добавить логирование
+- [ ] Настроить CI/CD
