@@ -63,6 +63,7 @@ export class UsersService {
 
       // 4. Удаляем пароль из ответа (для безопасности)
       // Используем деструктуризацию: берем password отдельно, всё остальное в userWithoutPassword
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { password, ...userWithoutPassword } = user;
 
       // 5. Возвращаем пользователя без пароля

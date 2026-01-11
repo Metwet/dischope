@@ -4,6 +4,7 @@ import { darkTheme, lightTheme } from "@/shared/theme/theme";
 import Header from "@/widgets/header/header";
 import { Container, CssBaseline, ThemeProvider } from "@mui/material";
 import { FC, ReactNode, useEffect, useMemo, useState } from "react";
+import AuthGuard from "../providers/AuthGuard/AuthGuard";
 
 interface IMainLayoutProps {
   children: ReactNode;
@@ -39,10 +40,12 @@ const MainLayout: FC<IMainLayoutProps> = ({ children }) => {
   return (
     <ThemeProvider theme={currentTheme}>
       <CssBaseline />
-      <Container maxWidth="xl">
-        <Header theme={theme} toggleTheme={toggleTheme} />
-        {children}
-      </Container>
+      <AuthGuard>
+        <Container maxWidth="xl">
+          <Header theme={theme} toggleTheme={toggleTheme} />
+          {children}
+        </Container>
+      </AuthGuard>
     </ThemeProvider>
   );
 };
