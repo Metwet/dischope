@@ -1,3 +1,6 @@
+/**
+ * @description Страница привычек.
+ */
 import { Box } from "@mui/material";
 
 const HabitsPage = () => {

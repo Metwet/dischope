@@ -1,7 +1,9 @@
-import {
-  useTaskById,
-  useUpdateTaskField,
-} from "@/entities/tasks/store/selectors";
+/**
+ * @description Карточка задачи с поддержкой drag-and-drop, чекбоксом и редактируемым текстом.
+ */
+"use client";
+
+import { useTaskById, useUpdateTaskField } from "../model/selectors";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { Box, Checkbox, FormControlLabel } from "@mui/material";

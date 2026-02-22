@@ -1,4 +1,7 @@
-import { useUpdateTaskField } from "@/entities/tasks/store/selectors";
+/**
+ * @description Текстовый инпут для редактирования задачи с debounce-сохранением в стор.
+ */
+import { useUpdateTaskField } from "../model/selectors";
 import { Input } from "@mui/material";
 import { ChangeEvent, FC, useEffect, useRef, useState } from "react";
 
@@ -17,11 +20,9 @@ export const TaskInput: FC<ITaskInputProps> = ({ id, value, lineThrough }) => {
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value;
     setText(newValue);
-    // Очистка старого таймера
     if (debounceTimer.current) {
       clearTimeout(debounceTimer.current);
     }
-    // Установка нового таймера
     debounceTimer.current = setTimeout(() => {
       updateTaskField(id, "text", newValue);
     }, 300);

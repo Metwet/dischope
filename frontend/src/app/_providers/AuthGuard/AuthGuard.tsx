@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
-import { useAuthStore } from "@/entities/auth/store/authStore";
+import { useAuthStore } from "@/entities/auth";
 import { Box, CircularProgress } from "@mui/material";
 
 /**

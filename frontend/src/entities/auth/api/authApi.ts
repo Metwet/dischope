@@ -1,12 +1,9 @@
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
+/**
+ * @description API-методы для авторизации: вход, регистрация, получение текущего пользователя.
+ */
+import { checkResponse } from "@/shared/api/httpClient";
 
-const checkResponse = async <T>(res: Response): Promise<T> => {
-  if (res.ok) {
-    return res.json();
-  } else {
-    return res.json().then((err) => Promise.reject(err));
-  }
-};
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
 
 export interface LoginRequest {
   email: string;
@@ -36,35 +33,22 @@ export interface User {
   updatedAt?: string;
 }
 
-/**
- * Логин пользователя
- */
 export const login = async (data: LoginRequest): Promise<AuthResponse> => {
   return fetch(`${API_URL}/auth/login`, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
   }).then((res) => checkResponse<AuthResponse>(res));
 };
 
-/**
- * Регистрация нового пользователя
- */
 export const register = async (data: RegisterRequest): Promise<User> => {
   return fetch(`${API_URL}/users`, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
   }).then((res) => checkResponse<User>(res));
 };
 
-/**
- * Получение информации о текущем пользователе
- */
 export const getCurrentUser = async (token: string): Promise<User> => {
   return fetch(`${API_URL}/auth/me`, {
     method: "GET",

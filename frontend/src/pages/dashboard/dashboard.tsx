@@ -1,4 +1,7 @@
-import { Dashboard } from "@/features/dashboard/Dashboard";
+/**
+ * @description Страница дашборда.
+ */
+import { Dashboard } from "@/widgets/dashboard";
 import { Box, Typography } from "@mui/material";
 
 const DashboardPage = () => {

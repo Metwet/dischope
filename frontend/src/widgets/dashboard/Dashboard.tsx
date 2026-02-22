@@ -1,6 +1,9 @@
+/**
+ * @description Виджет дашборда. Оркестрирует загрузку задач и DnD-контекст для колонок дней.
+ */
 "use client";
-import { useSetTasks, useTaskIds } from "@/entities/tasks/store/selectors";
-import { getTestTasks } from "@/shared/api/dashboard-api";
+
+import { useSetTasks, useTaskIds, getTestTasks } from "@/entities/task";
 import { useEffect } from "react";
 import { useDays } from "./model/useDays";
 import { useDnd } from "./model/useDnd";

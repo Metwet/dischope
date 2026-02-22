@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import MainLayout from "./layouts/main-layout";
+import MainLayout from "./_layouts/main-layout";
 
 export const metadata: Metadata = {
   title: "deschope",

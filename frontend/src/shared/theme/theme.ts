@@ -1,3 +1,6 @@
+/**
+ * @description Конфигурации тем MUI: светлая и тёмная.
+ */
 import { createTheme } from "@mui/material";
 
 export const darkTheme = createTheme({

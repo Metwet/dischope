@@ -1,3 +1,6 @@
+/**
+ * @description Аналог useEffect, но пропускает выполнение при первом монтировании компонента.
+ */
 import { useEffect, useRef } from "react";
 
 export const useUpdateEffect = (

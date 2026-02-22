@@ -1,3 +1,6 @@
+/**
+ * @description Зона сброса для drag-and-drop. Подсвечивает границу при наведении перетаскиваемого элемента.
+ */
 import { useDroppable } from "@dnd-kit/core";
 import { Box } from "@mui/material";
 import { ReactNode } from "react";

@@ -1,3 +1,6 @@
+/**
+ * @description Селекторы для подписки на срезы стора задач без лишних ре-рендеров.
+ */
 import { useTasksStore } from "./tasksStore";
 
 export const useTaskIds = () => useTasksStore((state) => state.taskIds);

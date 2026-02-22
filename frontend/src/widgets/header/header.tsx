@@ -1,10 +1,13 @@
+/**
+ * @description Шапка приложения с переключателем темы и кнопкой выхода. Скрывается на странице логина.
+ */
 "use client";
 
 import { Brightness4, Brightness7, Logout } from "@mui/icons-material";
 import { Box, IconButton, Tooltip, Typography } from "@mui/material";
 import { FC } from "react";
 import { useRouter, usePathname } from "next/navigation";
-import { useAuthStore } from "@/entities/auth/store/authStore";
+import { useAuthStore } from "@/entities/auth";
 import styles from "./header.module.css";
 
 interface IHeaderProps {

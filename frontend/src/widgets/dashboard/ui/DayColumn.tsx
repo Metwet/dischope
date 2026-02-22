@@ -1,11 +1,14 @@
-import { DroppableZone } from "@/shared/dnd/DroppableZone/DroppableZone";
+/**
+ * @description Колонка дня с задачами. Оборачивает список задач в droppable-зону и sortable-контекст.
+ */
+import { DroppableZone } from "@/shared/dnd";
+import { TaskItem } from "@/entities/task";
 import {
   SortableContext,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { Box, Typography } from "@mui/material";
 import { memo } from "react";
-import { TaskItem } from "./TaskItem";
 
 interface DayColumnProps {
   day: string;

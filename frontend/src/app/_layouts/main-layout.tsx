@@ -1,10 +1,13 @@
+/**
+ * @description Корневой layout приложения. Управляет темой (light/dark) и оборачивает контент в AuthGuard.
+ */
 "use client";
 
 import { darkTheme, lightTheme } from "@/shared/theme/theme";
-import Header from "@/widgets/header/header";
+import { Header } from "@/widgets/header";
 import { Container, CssBaseline, ThemeProvider } from "@mui/material";
 import { FC, ReactNode, useEffect, useMemo, useState } from "react";
-import AuthGuard from "../providers/AuthGuard/AuthGuard";
+import AuthGuard from "../_providers/AuthGuard/AuthGuard";
 
 interface IMainLayoutProps {
   children: ReactNode;

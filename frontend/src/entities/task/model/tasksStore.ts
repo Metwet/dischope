@@ -1,9 +1,11 @@
+/**
+ * @description Zustand-стор для задач. Хранит задачи в нормализованном виде (tasksById + taskIds).
+ */
 import { create } from "zustand";
 import { devtools } from "zustand/middleware";
 import { immer } from "zustand/middleware/immer";
 
 interface TaskStore {
-  // tasks: ITask[];
   tasksById: Record<number, ITask>;
   taskIds: number[];
   setTasks: (tasks: ITask[]) => void;
@@ -16,14 +18,11 @@ interface TaskStore {
 
 export const useTasksStore = create<TaskStore>()(
   devtools(
-    //persist(
     immer((set) => ({
-      // tasks: [],
       tasksById: {},
       taskIds: [],
       setTasks: (tasks) => {
         set((state) => {
-          //state.tasks = tasks;
           state.tasksById = {};
           state.taskIds = [];
           tasks.forEach((task) => {
@@ -43,7 +42,5 @@ export const useTasksStore = create<TaskStore>()(
       },
     })),
     { name: "tasks-store" }
-    // ),
-    // { name: "TaskStore" }
   )
 );

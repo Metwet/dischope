@@ -1,3 +1,6 @@
+/**
+ * @description Хук с логикой drag-and-drop для карточек задач между колонками дней.
+ */
 import { useCallback } from "react";
 import {
   DragEndEvent,
@@ -43,23 +46,19 @@ export const useDnd = ({ days, daysTasks, setDaysTasks }: UseDndParams) => {
       const overContainer = findContainer(over.id);
 
       if (!activeContainer || !overContainer) return;
-      if (activeContainer === overContainer) return; // внутри той же зоны — onDragEnd
+      if (activeContainer === overContainer) return;
 
       setDaysTasks((prev) => {
         const activeItems = [...prev[activeContainer]];
         const overItems = [...prev[overContainer]];
 
         const activeIndex = activeItems.indexOf(active.id as number);
-        // убрать из исходной
         activeItems.splice(activeIndex, 1);
 
-        // куда вставлять в целевой
         let overIndex: number;
         if (over.id === overContainer) {
-          // нависаем над пустой зоной или над "фоном" контейнера — кидаем в конец
           overIndex = overItems.length;
         } else {
-          // нависаем над конкретным элементом — вставим перед ним
           const idx = overItems.indexOf(over.id as number);
           overIndex = idx >= 0 ? idx : overItems.length;
         }
@@ -85,7 +84,6 @@ export const useDnd = ({ days, daysTasks, setDaysTasks }: UseDndParams) => {
       const overContainer = findContainer(over.id);
       if (!activeContainer || !overContainer) return;
 
-      // если ушли в другую зону — уже обработано в onDragOver
       if (activeContainer !== overContainer) return;
 
       const activeIndex = daysTasks[activeContainer].indexOf(
@@ -110,10 +108,5 @@ export const useDnd = ({ days, daysTasks, setDaysTasks }: UseDndParams) => {
     [daysTasks, findContainer, setDaysTasks]
   );
 
-  return {
-    sensors,
-    handleDragOver,
-    handleDragEnd,
-  };
+  return { sensors, handleDragOver, handleDragEnd };
 };
-
