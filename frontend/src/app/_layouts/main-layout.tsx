@@ -16,7 +16,7 @@ interface IMainLayoutProps {
 const MainLayout: FC<IMainLayoutProps> = ({ children }) => {
   const [theme, setTheme] = useState<TTheme>("light");
   const [isMounted, setIsMounted] = useState(false);
-  console.log("test pre-coomit") {};
+  console.log("test pre-coomit") {{}};
   
 
   const currentTheme = useMemo(
