@@ -34,7 +34,7 @@
     "typescript": "^5"
   },
   "simple-git-hooks": {
-    "pre-commit": "npx lint-staged"
+    "pre-commit": "cd frontend && npx lint-staged"
   },
   "lint-staged": {
     "src/**/*.{ts,tsx}": [
