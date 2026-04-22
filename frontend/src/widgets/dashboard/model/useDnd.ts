@@ -6,13 +6,12 @@ import {
   DragEndEvent,
   DragOverEvent,
   DragStartEvent,
-  KeyboardSensor,
   PointerSensor,
   UniqueIdentifier,
   useSensor,
   useSensors,
 } from "@dnd-kit/core";
-import { arrayMove, sortableKeyboardCoordinates } from "@dnd-kit/sortable";
+import { arrayMove } from "@dnd-kit/sortable";
 
 export interface DragCommitParams {
   nextDaysTasks: Record<string, string[]>;
@@ -68,12 +67,7 @@ export const useDnd = ({
     []
   );
 
-  const sensors = useSensors(
-    useSensor(PointerSensor),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
-    })
-  );
+  const sensors = useSensors(useSensor(PointerSensor));
 
   const findContainer = useCallback(
     (id: UniqueIdentifier): string | undefined => {

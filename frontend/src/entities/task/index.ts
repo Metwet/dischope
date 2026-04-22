@@ -1,5 +1,6 @@
 export {
   createTask,
+  deleteTask,
   getSprintYears,
   getTasks,
   getSprints,

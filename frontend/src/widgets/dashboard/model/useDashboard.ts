@@ -1,5 +1,5 @@
 import dayjs, { Dayjs } from "dayjs";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   createTask,
   getSprintYears,
@@ -24,14 +24,16 @@ export const useDashboard = () => {
   const [yearOptions, setYearOptions] = useState<number[]>([]);
   const [selectedYear, setSelectedYear] = useState<number | null>(null);
   const [sprintOptions, setSprintOptions] = useState<ISprintOption[]>([]);
-  const [selectedSprint, setSelectedSprint] = useState<ISprintOption | null>(null);
+  const [selectedSprint, setSelectedSprint] = useState<ISprintOption | null>(
+    null,
+  );
   const [isLoadingSprints, setIsLoadingSprints] = useState(true);
   const [isLoadingTasks, setIsLoadingTasks] = useState(false);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isCreatingTask, setIsCreatingTask] = useState(false);
   const [newTaskTitle, setNewTaskTitle] = useState("");
   const [newTaskDate, setNewTaskDate] = useState<Dayjs | null>(
-    dayjs().startOf("day")
+    dayjs().startOf("day"),
   );
   const [error, setError] = useState<string | null>(null);
 
@@ -101,7 +103,7 @@ export const useDashboard = () => {
         throw new Error("Task reorder failed");
       }
     },
-    [tasksById, updateTaskField]
+    [tasksById, updateTaskField],
   );
 
   const loadTasks = useCallback(
@@ -133,7 +135,7 @@ export const useDashboard = () => {
         setIsLoadingTasks(false);
       }
     },
-    [createDays, setTasks, user?.id]
+    [createDays, setTasks, user?.id],
   );
 
   const {
@@ -208,7 +210,7 @@ export const useDashboard = () => {
             previousSprint &&
             previousSprint.year === selectedYear &&
             nextOptions.some(
-              (option) => option.sprintNumber === previousSprint.sprintNumber
+              (option) => option.sprintNumber === previousSprint.sprintNumber,
             )
           ) {
             return previousSprint;
@@ -236,14 +238,6 @@ export const useDashboard = () => {
   useEffect(() => {
     void loadTasks(selectedSprint);
   }, [loadTasks, selectedSprint]);
-
-  const sprintSummary = useMemo(() => {
-    if (!selectedSprint) {
-      return null;
-    }
-
-    return `Спринт ${selectedSprint.sprintNumber}: ${selectedSprint.startDate} - ${selectedSprint.endDate}`;
-  }, [selectedSprint]);
 
   const handleOpenCreateModal = useCallback(() => {
     setNewTaskTitle("");
@@ -287,6 +281,10 @@ export const useDashboard = () => {
     }
   }, [loadTasks, newTaskDate, newTaskTitle, selectedSprint, user?.id]);
 
+  const reloadSelectedSprintTasks = useCallback(async () => {
+    await loadTasks(selectedSprint);
+  }, [loadTasks, selectedSprint]);
+
   return {
     days,
     daysTasks,
@@ -308,8 +306,8 @@ export const useDashboard = () => {
     selectedYear,
     sensors,
     sprintOptions,
-    sprintSummary,
     yearOptions,
+    reloadSelectedSprintTasks,
     setNewTaskDate,
     setNewTaskTitle,
     setSelectedSprint,

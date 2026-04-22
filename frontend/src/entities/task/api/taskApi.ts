@@ -86,6 +86,12 @@ export const createTask = async (data: CreateTaskRequest): Promise<ITask> => {
   }).then((res) => checkResponse<ITask>(res));
 };
 
+export const deleteTask = async (taskId: string): Promise<{ message: string }> => {
+  return fetch(`${API_URL}/tasks/${taskId}`, {
+    method: "DELETE",
+  }).then((res) => checkResponse<{ message: string }>(res));
+};
+
 export const reorderTasks = async (
   data: ReorderTasksRequest
 ): Promise<ITask[]> => {

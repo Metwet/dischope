@@ -8,16 +8,18 @@ import { ReactNode } from "react";
 export const DroppableZone = ({
   id,
   children,
+  borderStyle = "dashed",
 }: {
   id: string;
   children: ReactNode;
+  borderStyle?: "dashed" | "solid";
 }) => {
   const { setNodeRef, isOver } = useDroppable({ id });
   return (
     <Box
       ref={setNodeRef}
       sx={{
-        border: "1px dashed",
+        border: `1px ${borderStyle}`,
         borderColor: isOver ? "primary.main" : "grey.400",
         bgcolor: isOver ? "action.hover" : "transparent",
         borderRadius: 1,

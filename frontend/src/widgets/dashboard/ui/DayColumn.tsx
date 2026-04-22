@@ -17,20 +17,23 @@ const formatDayLabel = (day: string) =>
     month: "2-digit",
   }).format(new Date(`${day}T00:00:00.000Z`));
 
+const isToday = (day: string) => day === new Date().toISOString().slice(0, 10);
+
 interface DayColumnProps {
   day: string;
   tasks: string[];
+  onTaskMutated: () => Promise<void>;
 }
 
-const DayColumnComponent = ({ day, tasks }: DayColumnProps) => (
+const DayColumnComponent = ({ day, tasks, onTaskMutated }: DayColumnProps) => (
   <Box sx={{ width: "calc(100% / 7 - 16px)", minWidth: "180px" }}>
-    <DroppableZone id={day}>
+    <DroppableZone borderStyle={isToday(day) ? "solid" : "dashed"} id={day}>
       <SortableContext items={tasks} strategy={verticalListSortingStrategy}>
         <Typography sx={{ textTransform: "capitalize", mb: 1 }}>
           {formatDayLabel(day)}
         </Typography>
         {tasks.map((id) => (
-          <TaskItem id={id} key={id} />
+          <TaskItem id={id} key={id} onTaskMutated={onTaskMutated} />
         ))}
       </SortableContext>
     </DroppableZone>

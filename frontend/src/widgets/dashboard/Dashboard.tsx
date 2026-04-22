@@ -4,10 +4,10 @@
 "use client";
 
 import { closestCorners, DndContext } from "@dnd-kit/core";
-import { Alert, Box, CircularProgress, FormGroup, Typography } from "@mui/material";
+import { Alert, Box, CircularProgress, FormGroup } from "@mui/material";
 import { useDashboard } from "./model/useDashboard";
 import { CreateTaskDialog } from "./ui/CreateTaskDialog";
-import { DashboardFilters } from "./ui/DashboardFilters";
+import { DashboardToolbar } from "./ui/DashboardToolbar";
 import { DayColumn } from "./ui/DayColumn";
 
 export const Dashboard = () => {
@@ -31,8 +31,8 @@ export const Dashboard = () => {
     selectedSprint,
     selectedYear,
     sensors,
+    reloadSelectedSprintTasks,
     sprintOptions,
-    sprintSummary,
     yearOptions,
     setNewTaskDate,
     setNewTaskTitle,
@@ -42,7 +42,7 @@ export const Dashboard = () => {
 
   return (
     <Box sx={{ display: "grid", gap: 3, mt: 2 }}>
-      <DashboardFilters
+      <DashboardToolbar
         yearOptions={yearOptions}
         selectedYear={selectedYear}
         onYearChange={setSelectedYear}
@@ -53,10 +53,6 @@ export const Dashboard = () => {
         onCreateTaskClick={handleOpenCreateModal}
         isCreateTaskDisabled={!selectedSprint || !days.length}
       />
-
-      {sprintSummary && (
-        <Typography color="text.secondary">{sprintSummary}</Typography>
-      )}
 
       {error && <Alert severity="error">{error}</Alert>}
 
@@ -93,7 +89,12 @@ export const Dashboard = () => {
               }}
             >
               {days.map((day) => (
-                <DayColumn key={day} day={day} tasks={daysTasks[day] ?? []} />
+                <DayColumn
+                  key={day}
+                  day={day}
+                  tasks={daysTasks[day] ?? []}
+                  onTaskMutated={reloadSelectedSprintTasks}
+                />
               ))}
             </Box>
           </FormGroup>

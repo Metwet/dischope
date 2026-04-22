@@ -6,6 +6,8 @@
 import { darkTheme, lightTheme } from "@/shared/theme/theme";
 import { Header } from "@/widgets/header";
 import { Container, CssBaseline, ThemeProvider } from "@mui/material";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { FC, ReactNode, useEffect, useMemo, useState } from "react";
 import AuthGuard from "../_providers/AuthGuard/AuthGuard";
 
@@ -43,12 +45,14 @@ const MainLayout: FC<IMainLayoutProps> = ({ children }) => {
   return (
     <ThemeProvider theme={currentTheme}>
       <CssBaseline />
-      <AuthGuard>
-        <Container maxWidth="xl">
-          <Header theme={theme} toggleTheme={toggleTheme} />
-          {children}
-        </Container>
-      </AuthGuard>
+      <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="ru">
+        <AuthGuard>
+          <Container maxWidth="xl">
+            <Header theme={theme} toggleTheme={toggleTheme} />
+            {children}
+          </Container>
+        </AuthGuard>
+      </LocalizationProvider>
     </ThemeProvider>
   );
 };

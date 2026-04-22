@@ -1,7 +1,5 @@
 import { Dayjs } from "dayjs";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import {
   Box,
   Button,
@@ -54,23 +52,21 @@ export const CreateTaskDialog = ({
             fullWidth
           />
 
-          <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="ru">
-            <DatePicker
-              label="День спринта"
-              value={date}
-              onChange={(value) => onDateChange(value ? value.startOf("day") : null)}
-              disabled={isSubmitting}
-              format="DD.MM.YYYY"
-              slotProps={{
-                textField: {
-                  fullWidth: true,
-                  helperText: date
-                    ? formatDayOptionLabel(date.format("YYYY-MM-DD"))
-                    : "Выберите дату задачи",
-                },
-              }}
-            />
-          </LocalizationProvider>
+          <DatePicker
+            label="День спринта"
+            value={date}
+            onChange={(value) => onDateChange(value ? value.startOf("day") : null)}
+            disabled={isSubmitting}
+            format="DD.MM.YYYY"
+            slotProps={{
+              textField: {
+                fullWidth: true,
+                helperText: date
+                  ? formatDayOptionLabel(date.format("YYYY-MM-DD"))
+                  : "Выберите дату задачи",
+              },
+            }}
+          />
         </Box>
       </DialogContent>
       <DialogActions>

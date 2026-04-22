@@ -10,9 +10,15 @@ interface ITaskInputProps {
   id: string;
   value: string;
   lineThrough: boolean;
+  fullWidth?: boolean;
 }
 
-export const TaskInput: FC<ITaskInputProps> = ({ id, value, lineThrough }) => {
+export const TaskInput: FC<ITaskInputProps> = ({
+  id,
+  value,
+  lineThrough,
+  fullWidth = false,
+}) => {
   const updateTaskField = useUpdateTaskField();
   const [text, setText] = useState<string>(value);
 
@@ -49,6 +55,7 @@ export const TaskInput: FC<ITaskInputProps> = ({ id, value, lineThrough }) => {
     <Input
       value={text}
       onChange={handleInputChange}
+      fullWidth={fullWidth}
       sx={{ textDecoration: lineThrough ? "line-through" : "none" }}
       disableUnderline
       multiline
