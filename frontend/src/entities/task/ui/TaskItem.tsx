@@ -121,7 +121,9 @@ export const TaskItem = ({ id, onTaskMutated }: TaskItemProps) => {
       return;
     }
 
-    const nextPlannedAt = value ? toIsoDayStart(value.format("YYYY-MM-DD")) : null;
+    const nextPlannedAt = value
+      ? toIsoDayStart(value.format("YYYY-MM-DD"))
+      : null;
     const currentPlannedAt = activeTask.plannedAt
       ? toIsoDayStart(activeTask.plannedAt.slice(0, 10))
       : null;
@@ -138,7 +140,9 @@ export const TaskItem = ({ id, onTaskMutated }: TaskItemProps) => {
     setPlannedAtFeedbackMessage(null);
 
     try {
-      const updatedTask = await updateTask(activeTask.id, { plannedAt: nextPlannedAt });
+      const updatedTask = await updateTask(activeTask.id, {
+        plannedAt: nextPlannedAt,
+      });
       updateTaskField(activeTask.id, "plannedAt", updatedTask.plannedAt);
       updateTaskField(activeTask.id, "sortOrder", updatedTask.sortOrder);
       updateTaskField(activeTask.id, "updatedAt", updatedTask.updatedAt);
@@ -149,7 +153,7 @@ export const TaskItem = ({ id, onTaskMutated }: TaskItemProps) => {
       updateTaskField(activeTask.id, "plannedAt", previousPlannedAt);
       setPlannedAtFeedbackStatus("error");
       setPlannedAtFeedbackMessage(
-        getServerErrorMessage(caughtError, "Не удалось изменить плановую дату")
+        getServerErrorMessage(caughtError, "Не удалось изменить плановую дату"),
       );
     } finally {
       setIsBusy(false);
@@ -267,15 +271,17 @@ export const TaskItem = ({ id, onTaskMutated }: TaskItemProps) => {
           }}
           onPointerDown={stopPropagation}
           onClick={stopPropagation}
-          onDoubleClick={stopPropagation}
         />
         <Box
           onPointerDown={stopPropagation}
           onClick={stopPropagation}
-          onDoubleClick={stopPropagation}
           sx={{ minWidth: 0, flex: 1 }}
         >
-          <TaskInput id={task.id} value={task.title} lineThrough={task.completed} />
+          <TaskInput
+            id={task.id}
+            value={task.title}
+            lineThrough={task.completed}
+          />
         </Box>
       </Box>
       <TaskDetailsDialog
