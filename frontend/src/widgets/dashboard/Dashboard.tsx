@@ -9,6 +9,7 @@ import { useDashboard } from "./model/useDashboard";
 import { CreateTaskDialog } from "./ui/CreateTaskDialog";
 import { DashboardToolbar } from "./ui/DashboardToolbar";
 import { DayColumn } from "./ui/DayColumn";
+import { TaskTrashDropZone } from "./ui/TaskTrashDropZone";
 
 export const Dashboard = () => {
   const {
@@ -42,45 +43,50 @@ export const Dashboard = () => {
   } = useDashboard();
 
   return (
-    <Box sx={{ display: "grid", gap: 3, mt: 2 }}>
-      <DashboardToolbar
-        yearOptions={yearOptions}
-        selectedYear={selectedYear}
-        onYearChange={setSelectedYear}
-        sprintOptions={sprintOptions}
-        selectedSprint={selectedSprint}
-        isLoadingSprints={isLoadingSprints}
-        onSprintChange={setSelectedSprint}
-        onCreateTaskClick={handleOpenCreateModal}
-        isCreateTaskDisabled={!selectedSprint || !days.length}
-      />
+    <DndContext
+      sensors={sensors}
+      collisionDetection={closestCorners}
+      onDragStart={handleDragStart}
+      onDragOver={handleDragOver}
+      onDragCancel={handleDragCancel}
+      onDragEnd={handleDragEnd}
+    >
+      <Box sx={{ display: "grid", gap: 3, mt: 2 }}>
+        <DashboardToolbar
+          yearOptions={yearOptions}
+          selectedYear={selectedYear}
+          onYearChange={setSelectedYear}
+          sprintOptions={sprintOptions}
+          selectedSprint={selectedSprint}
+          isLoadingSprints={isLoadingSprints}
+          onSprintChange={setSelectedSprint}
+          onCreateTaskClick={handleOpenCreateModal}
+          isCreateTaskDisabled={!selectedSprint || !days.length}
+          trashDropZone={
+            !isLoadingTasks && days.length > 0 ? (
+              <TaskTrashDropZone />
+            ) : undefined
+          }
+        />
 
-      {error && <Alert severity="error">{error}</Alert>}
+        {error && <Alert severity="error">{error}</Alert>}
 
-      <CreateTaskDialog
-        open={isCreateModalOpen}
-        title={newTaskTitle}
-        date={newTaskDate}
-        isSubmitting={isCreatingTask}
-        onClose={handleCloseCreateModal}
-        onSubmit={handleCreateTask}
-        onTitleChange={setNewTaskTitle}
-        onDateChange={setNewTaskDate}
-      />
+        <CreateTaskDialog
+          open={isCreateModalOpen}
+          title={newTaskTitle}
+          date={newTaskDate}
+          isSubmitting={isCreatingTask}
+          onClose={handleCloseCreateModal}
+          onSubmit={handleCreateTask}
+          onTitleChange={setNewTaskTitle}
+          onDateChange={setNewTaskDate}
+        />
 
-      {isLoadingTasks ? (
-        <Box sx={{ display: "flex", justifyContent: "center", py: 8 }}>
-          <CircularProgress />
-        </Box>
-      ) : (
-        <DndContext
-          sensors={sensors}
-          collisionDetection={closestCorners}
-          onDragStart={handleDragStart}
-          onDragOver={handleDragOver}
-          onDragCancel={handleDragCancel}
-          onDragEnd={handleDragEnd}
-        >
+        {isLoadingTasks ? (
+          <Box sx={{ display: "flex", justifyContent: "center", py: 8 }}>
+            <CircularProgress />
+          </Box>
+        ) : (
           <FormGroup>
             <Box
               sx={{
@@ -100,8 +106,8 @@ export const Dashboard = () => {
               ))}
             </Box>
           </FormGroup>
-        </DndContext>
-      )}
-    </Box>
+        )}
+      </Box>
+    </DndContext>
   );
 };

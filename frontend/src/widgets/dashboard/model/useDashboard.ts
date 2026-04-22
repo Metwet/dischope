@@ -2,6 +2,7 @@ import dayjs, { Dayjs } from "dayjs";
 import { useCallback, useEffect, useState } from "react";
 import {
   createTask,
+  deleteTask,
   getSprintYears,
   getSprints,
   getTasks,
@@ -148,6 +149,20 @@ export const useDashboard = () => {
     [createDays, setTasks, user?.id],
   );
 
+  const handleTaskDroppedOnTrash = useCallback(
+    async (taskId: string) => {
+      setError(null);
+      try {
+        await deleteTask(taskId);
+        await loadTasks(selectedSprint);
+      } catch {
+        setError("Не удалось удалить задачу");
+        throw new Error("Task delete failed");
+      }
+    },
+    [loadTasks, selectedSprint],
+  );
+
   const {
     sensors,
     handleDragStart,
@@ -159,6 +174,7 @@ export const useDashboard = () => {
     daysTasks,
     setDaysTasks,
     onTasksCommit: handleTasksCommit,
+    onTaskDroppedOnTrash: handleTaskDroppedOnTrash,
   });
 
   useEffect(() => {

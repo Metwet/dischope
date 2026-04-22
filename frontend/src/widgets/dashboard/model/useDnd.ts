@@ -13,6 +13,9 @@ import {
 } from "@dnd-kit/core";
 import { arrayMove } from "@dnd-kit/sortable";
 
+/** id зоны сброса в корзину (toolbar), см. TaskTrashDropZone */
+export const DASHBOARD_TRASH_DROP_ID = "dashboard-trash-drop";
+
 export interface DragCommitParams {
   nextDaysTasks: Record<string, string[]>;
   previousDaysTasks: Record<string, string[]>;
@@ -25,6 +28,7 @@ interface UseDndParams {
   daysTasks: Record<string, string[]>;
   setDaysTasks: React.Dispatch<React.SetStateAction<Record<string, string[]>>>;
   onTasksCommit?: (params: DragCommitParams) => Promise<void> | void;
+  onTaskDroppedOnTrash?: (taskId: string) => Promise<void> | void;
 }
 
 interface DragMeta {
@@ -37,6 +41,7 @@ export const useDnd = ({
   daysTasks,
   setDaysTasks,
   onTasksCommit,
+  onTaskDroppedOnTrash,
 }: UseDndParams) => {
   const dragMetaRef = useRef<DragMeta | null>(null);
 
@@ -157,6 +162,39 @@ export const useDnd = ({
         return;
       }
 
+      if (over.id === DASHBOARD_TRASH_DROP_ID) {
+        const taskId = active.id as string;
+        let layoutBeforeDelete: Record<string, string[]> | null = null;
+
+        setDaysTasks((previous) => {
+          const sourceDay = days.find((key) => previous[key]?.includes(taskId));
+          if (!sourceDay) {
+            return previous;
+          }
+          layoutBeforeDelete = cloneDaysTasks(previous);
+          return {
+            ...previous,
+            [sourceDay]: previous[sourceDay].filter((id) => id !== taskId),
+          };
+        });
+
+        if (!layoutBeforeDelete) {
+          setDaysTasks(dragMeta.snapshot);
+          return;
+        }
+
+        if (!onTaskDroppedOnTrash) {
+          setDaysTasks(layoutBeforeDelete);
+          return;
+        }
+
+        const revertLayout = layoutBeforeDelete;
+        void Promise.resolve(onTaskDroppedOnTrash(taskId)).catch(() => {
+          setDaysTasks(revertLayout);
+        });
+        return;
+      }
+
       const activeContainer = findContainer(active.id);
       const overContainer = findContainer(over.id);
       if (!activeContainer || !overContainer) {
@@ -205,7 +243,16 @@ export const useDnd = ({
         setDaysTasks(dragMeta.snapshot);
       });
     },
-    [daysTasks, findContainer, isSameLayout, onTasksCommit, setDaysTasks],
+    [
+      cloneDaysTasks,
+      days,
+      daysTasks,
+      findContainer,
+      isSameLayout,
+      onTaskDroppedOnTrash,
+      onTasksCommit,
+      setDaysTasks,
+    ],
   );
 
   return {

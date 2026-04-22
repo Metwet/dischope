@@ -8,6 +8,7 @@ import {
   Typography,
 } from "@mui/material";
 import { KeyboardArrowLeft, KeyboardArrowRight } from "@mui/icons-material";
+import { ReactNode } from "react";
 
 interface DashboardToolbarProps {
   yearOptions: number[];
@@ -19,6 +20,7 @@ interface DashboardToolbarProps {
   onSprintChange: (sprint: ISprintOption | null) => void;
   onCreateTaskClick: () => void;
   isCreateTaskDisabled: boolean;
+  trashDropZone?: ReactNode;
 }
 
 export const DashboardToolbar = ({
@@ -31,6 +33,7 @@ export const DashboardToolbar = ({
   onSprintChange,
   onCreateTaskClick,
   isCreateTaskDisabled,
+  trashDropZone,
 }: DashboardToolbarProps) => {
   const selectedSprintIndex = selectedSprint
     ? sprintOptions.findIndex(
@@ -151,16 +154,18 @@ export const DashboardToolbar = ({
         </IconButton>
       </Box>
 
-      <Button
-        variant="contained"
-        onClick={onCreateTaskClick}
-        disabled={isCreateTaskDisabled}
+      <Box
         sx={{
-          minWidth: 180,
-          height: 56,
-          width: {
-            xs: "100%",
-            xl: "auto",
+          display: "flex",
+          flexDirection: "row",
+          flexWrap: "nowrap",
+          alignItems: "center",
+          justifyContent: "flex-end",
+          gap: 1,
+          width: "100%",
+          "@media (max-width: 400px)": {
+            flexDirection: "column",
+            alignItems: "center",
           },
           gridColumn: {
             xs: "1 / -1",
@@ -169,8 +174,25 @@ export const DashboardToolbar = ({
           },
         }}
       >
-        Создать задачу
-      </Button>
+        <Button
+          variant="contained"
+          onClick={onCreateTaskClick}
+          disabled={isCreateTaskDisabled}
+          sx={{
+            minWidth: 180,
+            height: 56,
+            width: "100%",
+            "@media (min-width: 401px)": {
+              width: "auto",
+              flex: "1 1 0",
+              minWidth: 180,
+            },
+          }}
+        >
+          Создать задачу
+        </Button>
+        {trashDropZone}
+      </Box>
     </Box>
   );
 };
