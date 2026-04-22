@@ -2,11 +2,19 @@ import {
   Injectable,
   NotFoundException,
   InternalServerErrorException,
+  BadRequestException,
 } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma.service';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
+import { FindTasksQueryDto } from './dto/find-tasks-query.dto';
+import { ReorderTasksDto } from './dto/reorder-tasks.dto';
+import {
+  getSprintDateRange,
+  getSprintYearForDate,
+  getSprintsForYear,
+} from './utils/sprint.utils';
 
 /**
  * TasksService - содержит всю бизнес-логику для работы с задачами
@@ -20,6 +28,77 @@ export class TasksService {
    */
   constructor(private readonly prisma: PrismaService) {}
 
+  private getDayStart(date: string): Date {
+    return new Date(`${date}T00:00:00.000Z`);
+  }
+
+  private getDayRange(date: Date): { start: Date; end: Date } {
+    const start = this.getDayStart(date.toISOString().slice(0, 10));
+    const end = new Date(start);
+    end.setUTCDate(end.getUTCDate() + 1);
+
+    return { start, end };
+  }
+
+  private buildWhereInput(
+    filters: FindTasksQueryDto = {},
+  ): Prisma.TaskWhereInput {
+    const { userId, sprintNumber, sprintYear } = filters;
+
+    if (
+      (sprintYear !== undefined && sprintNumber === undefined) ||
+      (sprintYear === undefined && sprintNumber !== undefined)
+    ) {
+      throw new BadRequestException(
+        'Для фильтрации по спринту нужно передать и sprintYear, и sprintNumber',
+      );
+    }
+
+    const where: Prisma.TaskWhereInput = {};
+
+    if (userId) {
+      where.userId = userId;
+    }
+
+    if (sprintYear !== undefined && sprintNumber !== undefined) {
+      let startInclusive: Date;
+      let endExclusive: Date;
+
+      try {
+        ({ startInclusive, endExclusive } = getSprintDateRange(
+          sprintYear,
+          sprintNumber,
+        ));
+      } catch (error) {
+        if (error instanceof RangeError) {
+          throw new BadRequestException(
+            'Некорректный номер спринта для выбранного года',
+          );
+        }
+
+        throw error;
+      }
+
+      where.OR = [
+        {
+          plannedAt: {
+            gte: startInclusive,
+            lt: endExclusive,
+          },
+        },
+        {
+          plannedAt: null,
+          createdAt: {
+            gte: startInclusive,
+            lt: endExclusive,
+          },
+        },
+      ];
+    }
+
+    return where;
+  }
+
   /**
    * Создание новой задачи
    *
@@ -28,13 +107,26 @@ export class TasksService {
    */
   async create(createTaskDto: CreateTaskDto) {
     try {
+      const plannedAt = createTaskDto.plannedAt
+        ? new Date(createTaskDto.plannedAt)
+        : null;
+      const sortOrder = plannedAt
+        ? await this.prisma.task.count({
+            where: {
+              userId: createTaskDto.userId,
+              plannedAt: {
+                gte: this.getDayRange(plannedAt).start,
+                lt: this.getDayRange(plannedAt).end,
+              },
+            },
+          })
+        : 0;
       const task = await this.prisma.task.create({
         data: {
           title: createTaskDto.title,
           userId: createTaskDto.userId,
-          plannedAt: createTaskDto.plannedAt
-            ? new Date(createTaskDto.plannedAt)
-            : null,
+          plannedAt,
+          sortOrder,
         },
         include: {
           user: {
@@ -59,9 +151,10 @@ export class TasksService {
    *
    * @returns массив всех задач
    */
-  async findAll() {
+  async findAll(filters: FindTasksQueryDto = {}) {
     try {
       const tasks = await this.prisma.task.findMany({
+        where: this.buildWhereInput(filters),
         include: {
           user: {
             select: {
@@ -71,13 +164,19 @@ export class TasksService {
             },
           },
         },
-        orderBy: {
-          createdAt: 'desc',
-        },
+        orderBy: [
+          { plannedAt: 'asc' },
+          { sortOrder: 'asc' },
+          { createdAt: 'asc' },
+        ],
       });
 
       return tasks;
     } catch (error) {
+      if (error instanceof BadRequestException) {
+        throw error;
+      }
+
       console.error('Ошибка при получении задач:', error);
       throw new InternalServerErrorException('Не удалось получить задачи');
     }
@@ -90,21 +189,118 @@ export class TasksService {
    * @returns массив задач пользователя
    */
   async findByUserId(userId: string) {
+    return this.findAll({ userId });
+  }
+
+  getSprints(year: number) {
+    return getSprintsForYear(year);
+  }
+
+  async getSprintYears(userId?: string) {
     try {
       const tasks = await this.prisma.task.findMany({
-        where: {
-          userId,
-        },
-        orderBy: {
-          createdAt: 'desc',
+        where: userId
+          ? {
+              userId,
+            }
+          : undefined,
+        select: {
+          plannedAt: true,
+          createdAt: true,
         },
       });
 
-      return tasks;
+      return [
+        ...new Set(
+          tasks.map((task) =>
+            getSprintYearForDate(task.plannedAt ?? task.createdAt),
+          ),
+        ),
+      ].sort((left, right) => left - right);
     } catch (error) {
-      console.error('Ошибка при получении задач пользователя:', error);
+      console.error('Ошибка при получении годов спринтов:', error);
       throw new InternalServerErrorException(
-        'Не удалось получить задачи пользователя',
+        'Не удалось получить доступные годы спринтов',
+      );
+    }
+  }
+
+  async reorder(reorderTasksDto: ReorderTasksDto) {
+    const uniqueTaskIds = [
+      ...new Set(reorderTasksDto.days.flatMap((day) => day.taskIds)),
+    ];
+
+    if (!uniqueTaskIds.length) {
+      throw new BadRequestException(
+        'Нужно передать хотя бы одну задачу для сортировки',
+      );
+    }
+
+    if (
+      uniqueTaskIds.length !==
+      reorderTasksDto.days.flatMap((day) => day.taskIds).length
+    ) {
+      throw new BadRequestException(
+        'Одна и та же задача не может встречаться несколько раз',
+      );
+    }
+
+    try {
+      const existingTasks = await this.prisma.task.findMany({
+        where: {
+          id: {
+            in: uniqueTaskIds,
+          },
+        },
+        select: {
+          id: true,
+        },
+      });
+
+      if (existingTasks.length !== uniqueTaskIds.length) {
+        throw new BadRequestException('Некоторые задачи не найдены');
+      }
+
+      await this.prisma.$transaction(
+        reorderTasksDto.days.flatMap(({ day, taskIds }) =>
+          taskIds.map((taskId, index) =>
+            this.prisma.task.update({
+              where: { id: taskId },
+              data: {
+                plannedAt: this.getDayStart(day),
+                sortOrder: index,
+              },
+            }),
+          ),
+        ),
+      );
+
+      const updatedTasks = await this.prisma.task.findMany({
+        where: {
+          id: {
+            in: uniqueTaskIds,
+          },
+        },
+        include: {
+          user: {
+            select: {
+              id: true,
+              email: true,
+              name: true,
+            },
+          },
+        },
+      });
+
+      return updatedTasks;
+    } catch (error) {
+      if (error instanceof BadRequestException) {
+        throw error;
+      }
+
+      console.error('Ошибка при сохранении порядка задач:', error);
+      throw new InternalServerErrorException(
+        'Не удалось сохранить порядок задач',
       );
     }
   }
@@ -177,6 +373,10 @@ export class TasksService {
         data.plannedAt = updateTaskDto.plannedAt
           ? new Date(updateTaskDto.plannedAt)
           : null;
+      }
+
+      if (updateTaskDto.sortOrder !== undefined) {
+        data.sortOrder = updateTaskDto.sortOrder;
       }
 
       const task = await this.prisma.task.update({

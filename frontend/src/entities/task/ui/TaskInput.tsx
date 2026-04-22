@@ -2,11 +2,12 @@
  * @description Текстовый инпут для редактирования задачи с debounce-сохранением в стор.
  */
 import { useUpdateTaskField } from "../model/selectors";
+import { updateTask } from "../api/taskApi";
 import { Input } from "@mui/material";
 import { ChangeEvent, FC, useEffect, useRef, useState } from "react";
 
 interface ITaskInputProps {
-  id: number;
+  id: string;
   value: string;
   lineThrough: boolean;
 }
@@ -24,9 +25,17 @@ export const TaskInput: FC<ITaskInputProps> = ({ id, value, lineThrough }) => {
       clearTimeout(debounceTimer.current);
     }
     debounceTimer.current = setTimeout(() => {
-      updateTaskField(id, "text", newValue);
+      updateTaskField(id, "title", newValue);
+      void updateTask(id, { title: newValue }).catch(() => {
+        updateTaskField(id, "title", value);
+        setText(value);
+      });
     }, 300);
   };
+
+  useEffect(() => {
+    setText(value);
+  }, [value]);
 
   useEffect(() => {
     return () => {

@@ -1,4 +1,11 @@
-export { getTestTasks } from "./api/taskApi";
+export {
+  createTask,
+  getSprintYears,
+  getTasks,
+  getSprints,
+  reorderTasks,
+  updateTask,
+} from "./api/taskApi";
 
 export {
   useTaskIds,

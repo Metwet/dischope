@@ -6,11 +6,11 @@ import { devtools } from "zustand/middleware";
 import { immer } from "zustand/middleware/immer";
 
 interface TaskStore {
-  tasksById: Record<number, ITask>;
-  taskIds: number[];
+  tasksById: Record<string, ITask>;
+  taskIds: string[];
   setTasks: (tasks: ITask[]) => void;
   updateTaskField: <K extends keyof ITask>(
-    id: number,
+    id: string,
     field: K,
     value: ITask[K]
   ) => void;

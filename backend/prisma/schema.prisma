@@ -28,6 +28,7 @@ model Task {
   id          String    @id @default(uuid())
   title       String
   completed   Boolean   @default(false)
+  sortOrder   Int       @default(0)
   createdAt   DateTime  @default(now())
   plannedAt   DateTime?
   completedAt DateTime?
@@ -38,5 +39,6 @@ model Task {
   @@index([userId])
   @@index([completed])
   @@index([plannedAt])
+  @@index([userId, plannedAt, sortOrder])
   @@map("tasks")
 }

@@ -1,4 +1,11 @@
-import { IsString, IsOptional, IsBoolean, IsDateString } from 'class-validator';
+import {
+  IsString,
+  IsOptional,
+  IsBoolean,
+  IsDateString,
+  IsInt,
+  Min,
+} from 'class-validator';
 
 /**
  * UpdateTaskDto - объект для валидации данных при обновлении задачи
@@ -29,4 +36,9 @@ export class UpdateTaskDto {
   @IsOptional()
   @IsDateString()
   plannedAt?: string;
+
+  @IsOptional()
+  @IsInt()
+  @Min(0)
+  sortOrder?: number;
 }

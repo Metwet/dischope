@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Controller,
   Get,
   Post,
@@ -13,6 +14,8 @@ import {
 import { TasksService } from './tasks.service';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
+import { FindTasksQueryDto } from './dto/find-tasks-query.dto';
+import { ReorderTasksDto } from './dto/reorder-tasks.dto';
 
 /**
  * TasksController - контроллер для обработки HTTP запросов, связанных с задачами
@@ -65,11 +68,26 @@ export class TasksController {
    * GET http://localhost:3000/tasks?userId=123e4567... - задачи конкретного пользователя
    */
   @Get()
-  async findAll(@Query('userId') userId?: string) {
-    if (userId) {
-      return await this.tasksService.findByUserId(userId);
+  async findAll(@Query() query: FindTasksQueryDto) {
+    return await this.tasksService.findAll(query);
+  }
+
+  @Get('sprints')
+  getSprints(@Query('year') year?: string) {
+    const sprintYear = year ? Number(year) : new Date().getFullYear();
+
+    if (!Number.isInteger(sprintYear) || sprintYear < 1) {
+      throw new BadRequestException(
+        'Параметр year должен быть положительным числом',
+      );
     }
-    return await this.tasksService.findAll();
+
+    return this.tasksService.getSprints(sprintYear);
+  }
+
+  @Get('sprint-years')
+  async getSprintYears(@Query('userId') userId?: string) {
+    return await this.tasksService.getSprintYears(userId);
   }
 
   /**
@@ -111,6 +129,11 @@ export class TasksController {
    *   "completed": true
    * }
    */
+  @Patch('reorder')
+  async reorder(@Body() reorderTasksDto: ReorderTasksDto) {
+    return await this.tasksService.reorder(reorderTasksDto);
+  }
+
   @Patch(':id')
   async update(@Param('id') id: string, @Body() updateTaskDto: UpdateTaskDto) {
     return await this.tasksService.update(id, updateTaskDto);

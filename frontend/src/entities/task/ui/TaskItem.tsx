@@ -4,15 +4,16 @@
 "use client";
 
 import { useTaskById, useUpdateTaskField } from "../model/selectors";
+import { updateTask } from "../api/taskApi";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { Box, Checkbox, FormControlLabel } from "@mui/material";
+import { Box, Checkbox, FormControlLabel, Paper } from "@mui/material";
 import { SyntheticEvent } from "react";
 import { TaskInput } from "./TaskInput";
 import { DragIndicator } from "@mui/icons-material";
 
 interface TaskItemProps {
-  id: number;
+  id: string;
 }
 
 export const TaskItem = ({ id }: TaskItemProps) => {
@@ -28,17 +29,22 @@ export const TaskItem = ({ id }: TaskItemProps) => {
   const updateTaskField = useUpdateTaskField();
 
   const handleCheck = (checkedTask: ITask, checked: boolean) => {
-    updateTaskField(checkedTask.id, "done", checked);
+    updateTaskField(checkedTask.id, "completed", checked);
+    void updateTask(checkedTask.id, { completed: checked }).catch(() => {
+      updateTaskField(checkedTask.id, "completed", checkedTask.completed);
+    });
   };
 
+  if (!task) {
+    return null;
+  }
+
   return (
-    <Box
+    <Paper
       ref={setNodeRef}
       style={style}
       sx={{
-        m: 1,
-        p: 2,
-        backgroundColor: "blue",
+        p: 1,
         display: "flex",
         alignItems: "center",
       }}
@@ -47,10 +53,14 @@ export const TaskItem = ({ id }: TaskItemProps) => {
         control={<Checkbox />}
         label={
           <Box>
-            <TaskInput id={task.id} value={task.text} lineThrough={task.done} />
+            <TaskInput
+              id={task.id}
+              value={task.title}
+              lineThrough={task.completed}
+            />
           </Box>
         }
-        checked={task.done}
+        checked={task.completed}
         onChange={(_event: SyntheticEvent<Element, Event>, checked: boolean) =>
           handleCheck(task, checked)
         }
@@ -64,6 +74,6 @@ export const TaskItem = ({ id }: TaskItemProps) => {
       >
         <DragIndicator />
       </Box>
-    </Box>
+    </Paper>
   );
 };
