@@ -285,6 +285,51 @@ export const useDashboard = () => {
     await loadTasks(selectedSprint);
   }, [loadTasks, selectedSprint]);
 
+  const insertEmptyTaskBelow = useCallback(
+    async (day: string, afterTaskId: string): Promise<string | null> => {
+      if (!user?.id || !selectedSprint) {
+        return null;
+      }
+
+      const ids = daysTasks[day];
+      if (!ids) {
+        return null;
+      }
+
+      const idx = ids.indexOf(afterTaskId);
+      if (idx === -1) {
+        return null;
+      }
+
+      setError(null);
+
+      try {
+        const newTask = await createTask({
+          title: "",
+          userId: user.id,
+          plannedAt: `${day}T00:00:00.000Z`,
+        });
+        const nextIds = [
+          ...ids.slice(0, idx + 1),
+          newTask.id,
+          ...ids.slice(idx + 1),
+        ];
+        await reorderTasks({ days: [{ day, taskIds: nextIds }] });
+        await loadTasks(selectedSprint);
+        return newTask.id;
+      } catch {
+        setError("Не удалось создать задачу");
+        try {
+          await loadTasks(selectedSprint);
+        } catch {
+          // ignore secondary load failure
+        }
+        return null;
+      }
+    },
+    [user?.id, selectedSprint, daysTasks, loadTasks],
+  );
+
   return {
     days,
     daysTasks,
@@ -296,6 +341,7 @@ export const useDashboard = () => {
     handleDragOver,
     handleDragStart,
     handleOpenCreateModal,
+    insertEmptyTaskBelow,
     isCreateModalOpen,
     isCreatingTask,
     isLoadingSprints,

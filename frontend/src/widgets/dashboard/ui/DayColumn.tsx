@@ -8,7 +8,7 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { Box, Typography } from "@mui/material";
-import { memo } from "react";
+import { memo, useCallback, useState } from "react";
 
 const formatDayLabel = (day: string) =>
   new Intl.DateTimeFormat("ru-RU", {
@@ -23,22 +23,51 @@ interface DayColumnProps {
   day: string;
   tasks: string[];
   onTaskMutated: () => Promise<void>;
+  insertEmptyTaskBelow: (
+    day: string,
+    afterTaskId: string,
+  ) => Promise<string | null>;
 }
 
-const DayColumnComponent = ({ day, tasks, onTaskMutated }: DayColumnProps) => (
-  <Box sx={{ width: "calc(100% / 7 - 16px)", minWidth: "180px" }}>
-    <DroppableZone borderStyle={isToday(day) ? "solid" : "dashed"} id={day}>
-      <SortableContext items={tasks} strategy={verticalListSortingStrategy}>
-        <Typography sx={{ textTransform: "capitalize", mb: 1 }}>
-          {formatDayLabel(day)}
-        </Typography>
-        {tasks.map((id) => (
-          <TaskItem id={id} key={id} onTaskMutated={onTaskMutated} />
-        ))}
-      </SortableContext>
-    </DroppableZone>
-  </Box>
-);
+const DayColumnComponent = ({
+  day,
+  tasks,
+  onTaskMutated,
+  insertEmptyTaskBelow,
+}: DayColumnProps) => {
+  const [focusTaskId, setFocusTaskId] = useState<string | null>(null);
+
+  const handleAutoFocusConsumed = useCallback(() => {
+    setFocusTaskId(null);
+  }, []);
+
+  return (
+    <Box sx={{ width: "calc(100% / 7 - 16px)", minWidth: "180px" }}>
+      <DroppableZone borderStyle={isToday(day) ? "solid" : "dashed"} id={day}>
+        <SortableContext items={tasks} strategy={verticalListSortingStrategy}>
+          <Typography sx={{ textTransform: "capitalize", mb: 1 }}>
+            {formatDayLabel(day)}
+          </Typography>
+          {tasks.map((id) => (
+            <TaskItem
+              id={id}
+              key={id}
+              onTaskMutated={onTaskMutated}
+              onEnterCreateBelow={async () => {
+                const newId = await insertEmptyTaskBelow(day, id);
+                if (newId) {
+                  setFocusTaskId(newId);
+                }
+              }}
+              autoFocusTitle={focusTaskId === id}
+              onAutoFocusConsumed={handleAutoFocusConsumed}
+            />
+          ))}
+        </SortableContext>
+      </DroppableZone>
+    </Box>
+  );
+};
 
 export const DayColumn = memo(DayColumnComponent);
 DayColumn.displayName = "DayColumn";

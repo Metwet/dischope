@@ -22,6 +22,7 @@ export const Dashboard = () => {
     handleDragOver,
     handleDragStart,
     handleOpenCreateModal,
+    insertEmptyTaskBelow,
     isCreateModalOpen,
     isCreatingTask,
     isLoadingSprints,
@@ -94,6 +95,7 @@ export const Dashboard = () => {
                   day={day}
                   tasks={daysTasks[day] ?? []}
                   onTaskMutated={reloadSelectedSprintTasks}
+                  insertEmptyTaskBelow={insertEmptyTaskBelow}
                 />
               ))}
             </Box>

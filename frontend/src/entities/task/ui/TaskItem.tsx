@@ -16,6 +16,9 @@ import { Dayjs } from "dayjs";
 interface TaskItemProps {
   id: string;
   onTaskMutated: () => Promise<void>;
+  onEnterCreateBelow?: () => Promise<void>;
+  autoFocusTitle?: boolean;
+  onAutoFocusConsumed?: () => void;
 }
 
 const SPRINT_DURATION_DAYS = 14;
@@ -48,7 +51,13 @@ const getServerErrorMessage = (error: unknown, fallback: string) => {
   return fallback;
 };
 
-export const TaskItem = ({ id, onTaskMutated }: TaskItemProps) => {
+export const TaskItem = ({
+  id,
+  onTaskMutated,
+  onEnterCreateBelow,
+  autoFocusTitle = false,
+  onAutoFocusConsumed,
+}: TaskItemProps) => {
   const { attributes, listeners, setNodeRef, transform, transition } =
     useSortable({ id });
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -270,6 +279,15 @@ export const TaskItem = ({ id, onTaskMutated }: TaskItemProps) => {
             id={task.id}
             value={task.title}
             lineThrough={task.completed}
+            onEnterWithoutShift={
+              onEnterCreateBelow
+                ? () => {
+                    void onEnterCreateBelow();
+                  }
+                : undefined
+            }
+            autoFocusTitle={autoFocusTitle}
+            onAutoFocusConsumed={onAutoFocusConsumed}
           />
         </Box>
       </Box>

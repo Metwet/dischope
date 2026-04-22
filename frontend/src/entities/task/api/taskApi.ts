@@ -19,7 +19,7 @@ export interface UpdateTaskRequest {
 }
 
 export interface CreateTaskRequest {
-  title: string;
+  title?: string;
   userId: string;
   plannedAt?: string;
 }
