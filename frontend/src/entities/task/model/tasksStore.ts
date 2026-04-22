@@ -9,10 +9,11 @@ interface TaskStore {
   tasksById: Record<string, ITask>;
   taskIds: string[];
   setTasks: (tasks: ITask[]) => void;
+  mergeTasks: (tasks: ITask[]) => void;
   updateTaskField: <K extends keyof ITask>(
     id: string,
     field: K,
-    value: ITask[K]
+    value: ITask[K],
   ) => void;
 }
 
@@ -31,6 +32,16 @@ export const useTasksStore = create<TaskStore>()(
           });
         });
       },
+      mergeTasks: (tasks) => {
+        set((state) => {
+          for (const task of tasks) {
+            state.tasksById[task.id] = task;
+            if (!state.taskIds.includes(task.id)) {
+              state.taskIds.push(task.id);
+            }
+          }
+        });
+      },
       updateTaskField: (id, field, value) => {
         set((state) => {
           const task = state.tasksById[id];
@@ -41,6 +52,6 @@ export const useTasksStore = create<TaskStore>()(
         });
       },
     })),
-    { name: "tasks-store" }
-  )
+    { name: "tasks-store" },
+  ),
 );

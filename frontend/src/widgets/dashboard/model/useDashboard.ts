@@ -6,6 +6,7 @@ import {
   getSprints,
   getTasks,
   reorderTasks,
+  useMergeTasks,
   useSetTasks,
   useTasksById,
   useUpdateTaskField,
@@ -18,6 +19,7 @@ export const useDashboard = () => {
   const currentYear = new Date().getFullYear();
   const user = useAuthStore((state) => state.user);
   const setTasks = useSetTasks();
+  const mergeTasks = useMergeTasks();
   const tasksById = useTasksById();
   const updateTaskField = useUpdateTaskField();
 
@@ -107,15 +109,21 @@ export const useDashboard = () => {
   );
 
   const loadTasks = useCallback(
-    async (sprint: ISprintOption | null) => {
+    async (sprint: ISprintOption | null, options?: { silent?: boolean }) => {
+      const silent = options?.silent === true;
+
       if (!user?.id || !sprint) {
-        setIsLoadingTasks(false);
+        if (!silent) {
+          setIsLoadingTasks(false);
+        }
         setTasks([]);
         createDays([], sprint);
         return;
       }
 
-      setIsLoadingTasks(true);
+      if (!silent) {
+        setIsLoadingTasks(true);
+      }
       setError(null);
 
       try {
@@ -132,7 +140,9 @@ export const useDashboard = () => {
         createDays([], sprint);
         setError("Не удалось загрузить задачи выбранного спринта");
       } finally {
-        setIsLoadingTasks(false);
+        if (!silent) {
+          setIsLoadingTasks(false);
+        }
       }
     },
     [createDays, setTasks, user?.id],
@@ -314,20 +324,23 @@ export const useDashboard = () => {
           newTask.id,
           ...ids.slice(idx + 1),
         ];
-        await reorderTasks({ days: [{ day, taskIds: nextIds }] });
-        await loadTasks(selectedSprint);
+        const updated = await reorderTasks({
+          days: [{ day, taskIds: nextIds }],
+        });
+        mergeTasks(updated);
+        setDaysTasks((previous) => ({ ...previous, [day]: nextIds }));
         return newTask.id;
       } catch {
         setError("Не удалось создать задачу");
         try {
-          await loadTasks(selectedSprint);
+          await loadTasks(selectedSprint, { silent: true });
         } catch {
           // ignore secondary load failure
         }
         return null;
       }
     },
-    [user?.id, selectedSprint, daysTasks, loadTasks],
+    [user?.id, selectedSprint, daysTasks, loadTasks, mergeTasks, setDaysTasks],
   );
 
   return {

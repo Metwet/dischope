@@ -13,6 +13,7 @@ export {
   useTasksById,
   useTaskById,
   useSetTasks,
+  useMergeTasks,
   useUpdateTaskField,
 } from "./model/selectors";
 

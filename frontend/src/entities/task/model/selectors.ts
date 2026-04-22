@@ -8,5 +8,6 @@ export const useTasksById = () => useTasksStore((state) => state.tasksById);
 export const useTaskById = (id: string) =>
   useTasksStore((state) => state.tasksById[id]);
 export const useSetTasks = () => useTasksStore((state) => state.setTasks);
+export const useMergeTasks = () => useTasksStore((state) => state.mergeTasks);
 export const useUpdateTaskField = () =>
   useTasksStore((state) => state.updateTaskField);
