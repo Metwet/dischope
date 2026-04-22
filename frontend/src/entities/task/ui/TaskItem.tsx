@@ -229,10 +229,6 @@ export const TaskItem = ({ id, onTaskMutated }: TaskItemProps) => {
     }
   };
 
-  const stopPropagation = (event: MouseEvent<HTMLElement>) => {
-    event.stopPropagation();
-  };
-
   if (!task) {
     return null;
   }
@@ -248,7 +244,6 @@ export const TaskItem = ({ id, onTaskMutated }: TaskItemProps) => {
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
-        gap: 1,
         cursor: transform ? "grabbing" : "grab",
       }}
     >
@@ -256,7 +251,7 @@ export const TaskItem = ({ id, onTaskMutated }: TaskItemProps) => {
         sx={{
           display: "flex",
           alignItems: "center",
-          gap: 1,
+          gap: 0.5,
           minWidth: 0,
           flex: 1,
         }}
@@ -269,14 +264,8 @@ export const TaskItem = ({ id, onTaskMutated }: TaskItemProps) => {
           ) => {
             void handleCheck(task, checked);
           }}
-          onPointerDown={stopPropagation}
-          onClick={stopPropagation}
         />
-        <Box
-          onPointerDown={stopPropagation}
-          onClick={stopPropagation}
-          sx={{ minWidth: 0, flex: 1 }}
-        >
+        <Box sx={{ minWidth: 0, flex: 1 }}>
           <TaskInput
             id={task.id}
             value={task.title}

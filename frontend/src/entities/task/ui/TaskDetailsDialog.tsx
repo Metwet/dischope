@@ -76,11 +76,7 @@ export const TaskDetailsDialog = ({
                 fullWidth
               />
             </Box>
-            <IconButton
-              aria-label="Закрыть"
-              onClick={onClose}
-              size="small"
-            >
+            <IconButton aria-label="Закрыть" onClick={onClose} size="small">
               <CloseIcon fontSize="small" />
             </IconButton>
           </Box>

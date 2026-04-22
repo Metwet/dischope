@@ -23,9 +23,7 @@ export interface DragCommitParams {
 interface UseDndParams {
   days: string[];
   daysTasks: Record<string, string[]>;
-  setDaysTasks: React.Dispatch<
-    React.SetStateAction<Record<string, string[]>>
-  >;
+  setDaysTasks: React.Dispatch<React.SetStateAction<Record<string, string[]>>>;
   onTasksCommit?: (params: DragCommitParams) => Promise<void> | void;
 }
 
@@ -45,15 +43,15 @@ export const useDnd = ({
   const cloneDaysTasks = useCallback(
     (value: Record<string, string[]>) =>
       Object.fromEntries(
-        Object.entries(value).map(([day, taskIds]) => [day, [...taskIds]])
+        Object.entries(value).map(([day, taskIds]) => [day, [...taskIds]]),
       ),
-    []
+    [],
   );
 
   const isSameLayout = useCallback(
     (
       first: Record<string, string[]>,
-      second: Record<string, string[]>
+      second: Record<string, string[]>,
     ): boolean =>
       Object.keys({ ...first, ...second }).every((day) => {
         const firstIds = first[day] ?? [];
@@ -64,17 +62,21 @@ export const useDnd = ({
           firstIds.every((taskId, index) => taskId === secondIds[index])
         );
       }),
-    []
+    [],
   );
 
-  const sensors = useSensors(useSensor(PointerSensor));
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: { distance: 6 },
+    }),
+  );
 
   const findContainer = useCallback(
     (id: UniqueIdentifier): string | undefined => {
       if (days.includes(id as string)) return id as string;
       return days.find((key) => daysTasks[key].includes(id as string));
     },
-    [days, daysTasks]
+    [days, daysTasks],
   );
 
   const handleDragStart = useCallback(
@@ -92,7 +94,7 @@ export const useDnd = ({
         snapshot: cloneDaysTasks(daysTasks),
       };
     },
-    [cloneDaysTasks, daysTasks, findContainer]
+    [cloneDaysTasks, daysTasks, findContainer],
   );
 
   const handleDragOver = useCallback(
@@ -130,7 +132,7 @@ export const useDnd = ({
         };
       });
     },
-    [findContainer, setDaysTasks]
+    [findContainer, setDaysTasks],
   );
 
   const handleDragCancel = useCallback(() => {
@@ -165,7 +167,7 @@ export const useDnd = ({
       let nextDaysTasks = daysTasks;
 
       const activeIndex = daysTasks[activeContainer].indexOf(
-        active.id as string
+        active.id as string,
       );
       const overIndex =
         over.id === overContainer
@@ -178,7 +180,7 @@ export const useDnd = ({
           [activeContainer]: arrayMove(
             daysTasks[activeContainer],
             activeIndex,
-            overIndex
+            overIndex,
           ),
         };
         setDaysTasks(nextDaysTasks);
@@ -198,12 +200,12 @@ export const useDnd = ({
           previousDaysTasks: dragMeta.snapshot,
           sourceDay: dragMeta.day,
           targetDay: activeContainer,
-        })
+        }),
       ).catch(() => {
         setDaysTasks(dragMeta.snapshot);
       });
     },
-    [daysTasks, findContainer, isSameLayout, onTasksCommit, setDaysTasks]
+    [daysTasks, findContainer, isSameLayout, onTasksCommit, setDaysTasks],
   );
 
   return {
