@@ -110,23 +110,27 @@ export const DashboardToolbar = ({
             option.sprintNumber === value.sprintNumber
           }
           sx={{ flex: 1, minWidth: 0 }}
-          renderOption={(props, option) => (
-            <Box
-              component="li"
-              {...props}
-              sx={{
-                bgcolor: option.isCurrent ? "success.light" : undefined,
-              }}
-            >
-              <Typography
-                variant="body2"
-                sx={{ fontWeight: option.isCurrent ? 700 : 400 }}
+          renderOption={(props, option) => {
+            const { key, ...optionProps } = props;
+            return (
+              <Box
+                key={key}
+                component="li"
+                {...optionProps}
+                sx={{
+                  bgcolor: option.isCurrent ? "success.light" : undefined,
+                }}
               >
-                {option.label}
-                {option.isCurrent ? " (текущий)" : ""}
-              </Typography>
-            </Box>
-          )}
+                <Typography
+                  variant="body2"
+                  sx={{ fontWeight: option.isCurrent ? 700 : 400 }}
+                >
+                  {option.label}
+                  {option.isCurrent ? " (текущий)" : ""}
+                </Typography>
+              </Box>
+            );
+          }}
           renderInput={(params) => (
             <TextField
               {...params}

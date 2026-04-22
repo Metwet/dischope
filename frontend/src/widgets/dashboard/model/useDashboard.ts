@@ -175,17 +175,19 @@ export const useDashboard = () => {
 
       try {
         const nextYears = await getSprintYears(user.id);
-        setYearOptions(nextYears);
+        const yearList = nextYears.length > 0 ? nextYears : [currentYear];
+
+        setYearOptions(yearList);
         setSelectedYear((previousYear) => {
-          if (previousYear && nextYears.includes(previousYear)) {
+          if (previousYear && yearList.includes(previousYear)) {
             return previousYear;
           }
 
-          if (nextYears.includes(currentYear)) {
+          if (yearList.includes(currentYear)) {
             return currentYear;
           }
 
-          return nextYears.at(-1) ?? null;
+          return yearList.at(-1) ?? null;
         });
       } catch {
         setYearOptions([]);
