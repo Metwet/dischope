@@ -27,7 +27,7 @@ interface TaskDetailsDialogProps {
   onToggleCompleted: (checked: boolean) => void;
   onPlannedAtChange: (value: Dayjs | null) => void;
   onMoveToNextSprint: () => void;
-  onDuplicate: () => void;
+  onDuplicate: (title?: string) => void;
   onDelete: () => void;
 }
 
@@ -74,6 +74,9 @@ export const TaskDetailsDialog = ({
                 value={task.title}
                 lineThrough={task.completed}
                 fullWidth
+                onDuplicate={(title) => {
+                  onDuplicate(title);
+                }}
               />
             </Box>
             <IconButton aria-label="Закрыть" onClick={onClose} size="small">
@@ -159,7 +162,9 @@ export const TaskDetailsDialog = ({
           На след. спринт
         </Button>
         <Button
-          onClick={onDuplicate}
+          onClick={() => {
+            onDuplicate();
+          }}
           disabled={isBusy}
           variant="contained"
           fullWidth

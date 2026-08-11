@@ -21,6 +21,8 @@ interface ITaskInputProps {
   fullWidth?: boolean;
   /** Enter без Shift: не вставлять перевод строки, сначала сохранить черновик, затем вызвать (только инлайн на дашборде). */
   onEnterWithoutShift?: () => void;
+  /** Ctrl/Cmd+D: сохранить черновик и дублировать задачу с текущим заголовком. */
+  onDuplicate?: (title: string) => void;
   /** Сфокусировать поле один раз (например, после вставки задачи снизу). */
   autoFocusTitle?: boolean;
   onAutoFocusConsumed?: () => void;
@@ -32,6 +34,7 @@ export const TaskInput: FC<ITaskInputProps> = ({
   lineThrough,
   fullWidth = false,
   onEnterWithoutShift,
+  onDuplicate,
   autoFocusTitle = false,
   onAutoFocusConsumed,
 }) => {
@@ -65,6 +68,13 @@ export const TaskInput: FC<ITaskInputProps> = ({
   };
 
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+    if (onDuplicate && e.code === "KeyD" && (e.ctrlKey || e.metaKey)) {
+      e.preventDefault();
+      flushTitleToServer(text);
+      onDuplicate(text);
+      return;
+    }
+
     if (!onEnterWithoutShift || e.key !== "Enter" || e.shiftKey) {
       return;
     }

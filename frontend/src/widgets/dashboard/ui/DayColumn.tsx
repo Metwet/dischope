@@ -27,6 +27,11 @@ interface DayColumnProps {
     day: string,
     afterTaskId: string,
   ) => Promise<string | null>;
+  duplicateTaskBelow: (
+    day: string,
+    afterTaskId: string,
+    title: string,
+  ) => Promise<string | null>;
 }
 
 const DayColumnComponent = ({
@@ -34,6 +39,7 @@ const DayColumnComponent = ({
   tasks,
   onTaskMutated,
   insertEmptyTaskBelow,
+  duplicateTaskBelow,
 }: DayColumnProps) => {
   const [focusTaskId, setFocusTaskId] = useState<string | null>(null);
 
@@ -59,6 +65,10 @@ const DayColumnComponent = ({
                   setFocusTaskId(newId);
                 }
               }}
+              onDuplicateBelow={async (title) =>
+                duplicateTaskBelow(day, id, title)
+              }
+              onFocusTask={setFocusTaskId}
               autoFocusTitle={focusTaskId === id}
               onAutoFocusConsumed={handleAutoFocusConsumed}
             />

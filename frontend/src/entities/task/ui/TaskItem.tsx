@@ -4,7 +4,7 @@
 "use client";
 
 import { useTaskById, useUpdateTaskField } from "../model/selectors";
-import { createTask, deleteTask, updateTask } from "../api/taskApi";
+import { deleteTask, updateTask } from "../api/taskApi";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { Box, Checkbox, Paper } from "@mui/material";
@@ -17,6 +17,8 @@ interface TaskItemProps {
   id: string;
   onTaskMutated: () => Promise<void>;
   onEnterCreateBelow?: () => Promise<void>;
+  onDuplicateBelow?: (title: string) => Promise<string | null>;
+  onFocusTask?: (taskId: string) => void;
   autoFocusTitle?: boolean;
   onAutoFocusConsumed?: () => void;
 }
@@ -55,6 +57,8 @@ export const TaskItem = ({
   id,
   onTaskMutated,
   onEnterCreateBelow,
+  onDuplicateBelow,
+  onFocusTask,
   autoFocusTitle = false,
   onAutoFocusConsumed,
 }: TaskItemProps) => {
@@ -193,8 +197,12 @@ export const TaskItem = ({
     }
   };
 
-  const handleDuplicate = async () => {
-    if (!activeTask) {
+  const handleDuplicate = async (
+    sourceTask?: ITask,
+    titleOverride?: string,
+  ) => {
+    const taskToDuplicate = sourceTask ?? activeTask;
+    if (!taskToDuplicate || isBusy || !onDuplicateBelow) {
       return;
     }
 
@@ -202,16 +210,22 @@ export const TaskItem = ({
     setError(null);
 
     try {
-      const duplicatedTask = await createTask({
-        title: `${activeTask.title} (копия)`,
-        userId: activeTask.userId,
-        ...(activeTask.plannedAt ? { plannedAt: activeTask.plannedAt } : {}),
-      });
-      await onTaskMutated();
-      setModalTaskId(duplicatedTask.id);
-      setPlannedAtFeedbackStatus("idle");
-      setPlannedAtFeedbackMessage(null);
-      setShouldReloadAfterClose(false);
+      const newId = await onDuplicateBelow(
+        titleOverride ?? taskToDuplicate.title,
+      );
+      if (!newId) {
+        setError("Не удалось дублировать задачу");
+        return;
+      }
+
+      if (isModalOpen) {
+        setModalTaskId(newId);
+        setPlannedAtFeedbackStatus("idle");
+        setPlannedAtFeedbackMessage(null);
+        setShouldReloadAfterClose(false);
+      } else {
+        onFocusTask?.(newId);
+      }
     } catch {
       setError("Не удалось дублировать задачу");
     } finally {
@@ -286,6 +300,9 @@ export const TaskItem = ({
                   }
                 : undefined
             }
+            onDuplicate={(title) => {
+              void handleDuplicate(task, title);
+            }}
             autoFocusTitle={autoFocusTitle}
             onAutoFocusConsumed={onAutoFocusConsumed}
           />
@@ -310,8 +327,8 @@ export const TaskItem = ({
         onMoveToNextSprint={() => {
           void handleMoveToNextSprint();
         }}
-        onDuplicate={() => {
-          void handleDuplicate();
+        onDuplicate={(title) => {
+          void handleDuplicate(undefined, title);
         }}
         onDelete={() => {
           void handleDelete();

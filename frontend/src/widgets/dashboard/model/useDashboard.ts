@@ -361,6 +361,58 @@ export const useDashboard = () => {
     [user?.id, selectedSprint, daysTasks, loadTasks, mergeTasks, setDaysTasks],
   );
 
+  const duplicateTaskBelow = useCallback(
+    async (
+      day: string,
+      afterTaskId: string,
+      title: string,
+    ): Promise<string | null> => {
+      if (!user?.id || !selectedSprint) {
+        return null;
+      }
+
+      const ids = daysTasks[day];
+      if (!ids) {
+        return null;
+      }
+
+      const idx = ids.indexOf(afterTaskId);
+      if (idx === -1) {
+        return null;
+      }
+
+      setError(null);
+
+      try {
+        const newTask = await createTask({
+          title: `${title} (копия)`,
+          userId: user.id,
+          plannedAt: `${day}T00:00:00.000Z`,
+        });
+        const nextIds = [
+          ...ids.slice(0, idx + 1),
+          newTask.id,
+          ...ids.slice(idx + 1),
+        ];
+        const updated = await reorderTasks({
+          days: [{ day, taskIds: nextIds }],
+        });
+        mergeTasks(updated);
+        setDaysTasks((previous) => ({ ...previous, [day]: nextIds }));
+        return newTask.id;
+      } catch {
+        setError("Не удалось дублировать задачу");
+        try {
+          await loadTasks(selectedSprint, { silent: true });
+        } catch {
+          // ignore secondary load failure
+        }
+        return null;
+      }
+    },
+    [user?.id, selectedSprint, daysTasks, loadTasks, mergeTasks, setDaysTasks],
+  );
+
   return {
     days,
     daysTasks,
@@ -373,6 +425,7 @@ export const useDashboard = () => {
     handleDragStart,
     handleOpenCreateModal,
     insertEmptyTaskBelow,
+    duplicateTaskBelow,
     isCreateModalOpen,
     isCreatingTask,
     isLoadingSprints,
