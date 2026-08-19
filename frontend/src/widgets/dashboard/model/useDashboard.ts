@@ -385,7 +385,7 @@ export const useDashboard = () => {
 
       try {
         const newTask = await createTask({
-          title: `${title}`,
+          title,
           userId: user.id,
           plannedAt: `${day}T00:00:00.000Z`,
         });
