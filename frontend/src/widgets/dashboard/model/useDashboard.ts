@@ -210,7 +210,7 @@ export const useDashboard = () => {
         setSelectedYear(null);
         setSprintOptions([]);
         setSelectedSprint(null);
-        setError("Не удалось загрузить доступные годы");
+        setError("Не удалось загрузить года спринтов");
       }
     };
 

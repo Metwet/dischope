@@ -51,5 +51,9 @@ backend/generated/
 *.db
 *.sqlite
 
+# local Postgres dumps (pg_dump)
+backup-experiment*.sql
+docker/*.sql
+
 # helpers
 /help-info
