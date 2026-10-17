@@ -14,7 +14,7 @@ async function bootstrap() {
    * Это позволяет frontend (который работает на другом порту) делать запросы к backend
    */
   app.enableCors({
-    origin: 'http://localhost:3001', // Разрешаем запросы с frontend
+    origin: process.env.FRONTEND_ORIGIN, // Разрешаем запросы с frontend
     credentials: true, // Разрешаем отправку cookies
   });
 
